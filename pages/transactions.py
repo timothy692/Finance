@@ -54,7 +54,7 @@ class TransactionsPage(Page):
         # Summary panels
 
         panel_container = QWidget()
-        panel_layout = QHBoxLayout()
+        panel_layout = QHBoxLayout(panel_container)
         panel_layout.setContentsMargins(0,0,0,0)
         panel_layout.setSpacing(25)
 
@@ -70,6 +70,7 @@ class TransactionsPage(Page):
             PanelWidget('Net income', 10000), stretch=1
         )
 
+        panel_layout.addStretch()
         panel_container.setLayout(panel_layout)
         self.layout_bottom.addWidget(panel_container)
 
