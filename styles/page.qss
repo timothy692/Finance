@@ -1,0 +1,28 @@
+QFrame#page {
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+QPushButton#transaction {
+    color: white;
+    font-family: 'Inter';
+    font-size: 24px;
+    background-color: #3c40bc;
+    border: none;
+    border-radius: 10px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+QPushButton#export, QPushButton#import {
+    background-color: white;
+    color: black;
+    font-family: 'Inter';
+    font-size: 24px;
+    border: 1px solid #D3D3D3; 
+    border-radius: 10px;
+    margin-right: 18px;
+    padding-right: 5px;
+}

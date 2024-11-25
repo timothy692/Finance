@@ -1,0 +1,32 @@
+QFrame#sidebar {
+    background-color: #f8f8fa;
+    border-right: 2px solid #c8c8c8;
+    margin: 0;
+    padding: 0;
+}
+
+QPushButton {
+    color: #545454;
+    background-color: transparent;
+    border: 0px solid transparent;
+    border-radius: 15px;
+    font-family: 'Inter Regular';
+    font-size: 29px;
+    text-align: left;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+QPushButton:focus {
+    outline: none;
+    background-color: white;
+}
+
+QPushButton:hover {
+    background-color: white;
+    color: black;
+}

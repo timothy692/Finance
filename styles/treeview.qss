@@ -1,0 +1,31 @@
+QTreeView {                         /* Rows and content */
+    background-color: white; 
+    font-family: 'Inter';
+    color: black;
+    border: none;
+    font-size: 25px;
+    margin: 0px;
+    padding: 0px;
+}
+
+QTreeView::item {                   /* Row */
+    height: 100px;
+    /* color: black; */
+}
+
+QHeaderView {                       /* Header */
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+}
+
+QHeaderView::section {              /* Header */
+    background-color: #f8f8fa;
+    color: #545454;
+    font-family: 'Inter';
+    font-size: 25px; 
+    border: none;                   /* TODO: fix border edge bug */
+    /* border: 1px solid #f8f8fa;
+    border-radius: 5px; */
+    padding-left: 60px;
+    margin: 0px;
+}
