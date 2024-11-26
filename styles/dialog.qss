@@ -1,10 +1,10 @@
 QDialog {
-    background-color: white;
-    border-radius: 15px;
+    border: none;
 }
 
 QLabel#title {
     font-family: 'Inter';
-    font-size: 20px;
+    font-weight:400;
+    font-size: 25px;
     color: black;
 }

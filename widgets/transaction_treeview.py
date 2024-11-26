@@ -97,7 +97,7 @@ class TransactionTableModel(QAbstractTableModel):
         if role == qt.ItemDataRole.DisplayRole:
             # Special formatting for amount column
             if col == 2:
-                return f'{'+ ' if value > 0 else ''}NT${abs(value):,.2f}'
+                return f'{'+ ' if value > 0 else ''}${abs(value):,.2f}'
             
             return value
         

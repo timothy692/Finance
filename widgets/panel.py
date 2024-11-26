@@ -45,10 +45,12 @@ class PanelWidget(QFrame):
 
         indicator_layout = QHBoxLayout()
         indicator_layout.setContentsMargins(0, 0, 0, 0)
-        indicator_layout.setSpacing(5) 
+        indicator_layout.setSpacing(10) 
 
         icon_label = QLabel()
-        icon_pixmap = QPixmap("assets/uptrend.png").scaled(35, 35, qt.AspectRatioMode.KeepAspectRatio, qt.TransformationMode.SmoothTransformation)
+        icon_pixmap = QPixmap('assets/uptrend.png').scaled(32, 32, 
+                                                           qt.AspectRatioMode.KeepAspectRatio, 
+                                                           qt.TransformationMode.SmoothTransformation)
         icon_label.setPixmap(icon_pixmap)
 
         indicator = QLabel('0% vs last month')
