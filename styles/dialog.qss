@@ -10,9 +10,16 @@ QLabel#title {
     color: black;
 }
 
+QLabel#widget-label {
+    font-family: 'Inter';
+    font-size: 21px;
+    font-weight: 500;
+    color: black;
+}
+
 QLineEdit#textbox {
     background-color: white;
-    border: 1px solid rgba(186, 186, 186, 255);
+    border: 1px solid rgba(186, 186, 186, 200);
     border-radius: 12px;
     color: black;
     font-size: 22px;
@@ -21,7 +28,7 @@ QLineEdit#textbox {
     font-family: 'Inter';
 }
 
-QLineEdit#textbox:focus, QLineEdit#textbox:hover {
+QLineEdit#textbox:focus {
     border: 1px solid #3c40bc;
     border-radius: 12px;
 }

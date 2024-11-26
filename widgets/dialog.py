@@ -32,6 +32,12 @@ class FramelessDialog(QDialog):
         tb.setPlaceholderText(placeholder)
         tb.setReadOnly(False)
         return tb
+    
+    def create_widget_label(self, text: str) -> QLabel:
+        label = QLabel(text)
+        label.setObjectName('widget-label')
+        label.setFixedHeight(25)
+        return label
 
     def _init_gui(self) -> None:
         layout = QVBoxLayout()
@@ -61,7 +67,7 @@ class FramelessDialog(QDialog):
         
         close = QPushButton()
         close.setIcon(QIcon(
-            QPixmap('assets/close.png').scaled(21, 21, 
+            QPixmap('assets/icons/close.png').scaled(21, 21, 
                                               qt.AspectRatioMode.KeepAspectRatio,
                                               qt.TransformationMode.SmoothTransformation)
         ))
@@ -99,43 +105,6 @@ class FramelessDialog(QDialog):
             dialog_geometry = self.frameGeometry()
             dialog_geometry.moveCenter(parent_geometry.center())
             self.move(dialog_geometry.topLeft())
-
-    # def paintEvent(self, event):
-    #     painter = QPainter(self)
-    #     painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-
-    #     pen_width = 2
-    #     pen = QPen(QColor(235, 235, 235, 250), pen_width, qt.PenStyle.SolidLine)
-    #     painter.setPen(pen)
-
-    #     painter.setBrush(QBrush(QColor('white')))
-
-    #     # Adjust rect to avoid overlap
-    #     rect = self.rect().adjusted(pen_width // 2, pen_width // 2, -pen_width // 2, -pen_width // 2)
-    #     painter.drawRoundedRect(rect, 15, 15)
-
-    # def _is_in_top_bar(self, pos):
-    #     """Check if the click is within the top bar."""
-    #     bar_height = self.top_bar.geometry().height()
-    #     return 0 <= pos.y() <= bar_height
-
-    # def mousePressEvent(self, event):
-    #     if event.button() == qt.MouseButton.LeftButton and self._is_in_top_bar(event.pos()):
-    #         self._is_dragging = True
-    #         self._drag_position = event.globalPosition().toPoint()
-    #         event.accept()
-
-    # def mouseMoveEvent(self, event):
-    #     if self._is_dragging and event.buttons() == qt.MouseButton.LeftButton:
-    #         delta = event.globalPosition().toPoint() - self._drag_position
-    #         self.move(self.pos() + delta)
-    #         self._drag_position = event.globalPosition().toPoint() 
-    #         event.accept()
-
-    # def mouseReleaseEvent(self, event):
-    #     if event.button() == qt.MouseButton.LeftButton:
-    #         self._is_dragging = False
-    #         event.accept()
 
     def keyPressEvent(self, event):
         if event.key() == qt.Key.Key_Escape:

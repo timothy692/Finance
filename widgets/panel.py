@@ -48,7 +48,7 @@ class PanelWidget(QFrame):
         indicator_layout.setSpacing(10) 
 
         icon_label = QLabel()
-        icon_pixmap = QPixmap('assets/uptrend.png').scaled(32, 32, 
+        icon_pixmap = QPixmap('assets/icons/uptrend.png').scaled(32, 32, 
                                                            qt.AspectRatioMode.KeepAspectRatio, 
                                                            qt.TransformationMode.SmoothTransformation)
         icon_label.setPixmap(icon_pixmap)

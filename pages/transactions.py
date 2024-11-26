@@ -38,11 +38,11 @@ class TransactionsPage(Page):
         )
 
         export_btn = create_button(
-            '  Export CSV', 'export', 210, 'assets/export.png'
+            '  Export CSV', 'export', 210, 'assets/icons/export.png'
         )
 
         import_btn = create_button(
-            '  Import CSV', 'import', 210, 'assets/import.png'
+            '  Import CSV', 'import', 210, 'assets/icons/import.png'
         )
 
         self.layout_top.addWidget(import_btn, alignment=qt.AlignmentFlag.AlignLeft)
