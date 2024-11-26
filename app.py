@@ -3,7 +3,7 @@ import os
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt as qt
 from PyQt6.QtCore import QSize
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QGuiApplication
 from util.style_util import load_stylesheet
 from pages.transactions import TransactionsPage
 from typing import List
@@ -16,6 +16,8 @@ class App(QMainWindow):
             self.app = QApplication(sys.argv)
         else:
             self.app = QApplication.instance() 
+
+        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 
         super().__init__()
 

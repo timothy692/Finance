@@ -11,9 +11,9 @@ def initLogger():
         format='%(asctime)s - %(levelname)s: %(message)s'
     )
 
-os.environ["QT_QPA_PLATFORM"]           = "xcb" 
-os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
-os.environ["QT_SCALE_FACTOR"]           = "0.80" 
+os.environ["QT_QPA_PLATFORM"]           = "wayland" 
+os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "2"
+os.environ["QT_SCALE_FACTOR"]           = "0.8" 
 os.environ["QT_FONT_DPI"]               = "96"
 
 

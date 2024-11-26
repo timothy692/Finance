@@ -16,9 +16,10 @@ class TransactionsPage(Page):
         self.layout().addStretch()
 
     def show_transaction_dialog(self) -> None:
-        dialog = TransactionDialog()
-        if dialog.exec():
-            print('exec')
+        dialog = TransactionDialog(self)
+        dialog.center()
+
+        dialog.exec()
 
     def _init_top_container(self) -> None:
         def create_button(label: str, object_name: str, width: int, icon: str=None) -> QPushButton:

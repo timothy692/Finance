@@ -1,5 +1,6 @@
 QDialog {
-    border: none;
+    border: 1px solid #c6c6c6;
+    border-radius: 12px;
 }
 
 QLabel#title {
@@ -7,4 +8,20 @@ QLabel#title {
     font-size: 24px;
     padding-left: 20px;
     color: black;
+}
+
+QLineEdit#textbox {
+    background-color: white;
+    border: 1px solid rgba(186, 186, 186, 255);
+    border-radius: 12px;
+    color: black;
+    font-size: 22px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-family: 'Inter';
+}
+
+QLineEdit#textbox:focus, QLineEdit#textbox:hover {
+    border: 1px solid #3c40bc;
+    border-radius: 12px;
 }
