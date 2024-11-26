@@ -28,10 +28,10 @@ class FramelessDialog(QDialog):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
 
         pen_width = 2
-        pen = QPen(QColor('#E0E0E0'), pen_width)
+        pen = QPen(QColor(235, 235, 235, 250), pen_width, qt.PenStyle.SolidLine)
         painter.setPen(pen)
 
         painter.setBrush(QBrush(QColor('white')))
@@ -50,9 +50,9 @@ class FramelessDialog(QDialog):
         separator_layout.setContentsMargins(0,0,0,0)
 
         separator = QFrame()
-        separator.setFixedHeight(1)
+        separator.setFixedHeight(2)
         separator.setStyleSheet(
-            'background-color: #F0F0F0;'
+            'background-color: rgba(240, 240, 240, 80);'
         )
         separator.setFrameShape(QFrame.Shape.HLine)
         separator.setFrameShadow(QFrame.Shadow.Sunken)
@@ -61,18 +61,18 @@ class FramelessDialog(QDialog):
         # Top bar
 
         self.top_bar = QHBoxLayout()
-        self.top_bar.setContentsMargins(30,20,30,10)
+        self.top_bar.setContentsMargins(25,20,25,10)
         
         title = QLabel(self.title)
         title.setObjectName('title')
         
         close = QPushButton()
         close.setIcon(QIcon(
-            QPixmap('assets/close.png').scaled(20, 20, 
+            QPixmap('assets/close.png').scaled(21, 21, 
                                               qt.AspectRatioMode.KeepAspectRatio,
                                               qt.TransformationMode.SmoothTransformation)
         ))
-        close.setIconSize(QSize(20,20))
+        close.setIconSize(QSize(21,21))
 
         close.setStyleSheet(
             '''
@@ -87,12 +87,16 @@ class FramelessDialog(QDialog):
         self.top_bar.addWidget(title, alignment=qt.AlignmentFlag.AlignCenter)
         self.top_bar.addStretch()
         self.top_bar.addWidget(close, alignment=qt.AlignmentFlag.AlignRight)
-
         
-
         layout.addLayout(self.top_bar)
         layout.addLayout(separator_layout)
         layout.addStretch()
+
+        self.container = QVBoxLayout()
+        self.container.setContentsMargins(30,20,30,30)
+        self.container.setSpacing(0)
+
+        layout.addLayout(self.container, stretch=1)
 
         self.setLayout(layout)
 
@@ -109,10 +113,9 @@ class FramelessDialog(QDialog):
 
     def mouseMoveEvent(self, event):
         if self._is_dragging and event.buttons() == qt.MouseButton.LeftButton:
-            # Calculate the delta and move the dialog
             delta = event.globalPosition().toPoint() - self._drag_position
             self.move(self.pos() + delta)
-            self._drag_position = event.globalPosition().toPoint()  # Update the last drag position
+            self._drag_position = event.globalPosition().toPoint() 
             event.accept()
 
     def mouseReleaseEvent(self, event):

@@ -4,7 +4,7 @@ QDialog {
 
 QLabel#title {
     font-family: 'Inter';
-    font-weight:400;
-    font-size: 25px;
+    font-size: 24px;
+    padding-left: 20px;
     color: black;
 }
