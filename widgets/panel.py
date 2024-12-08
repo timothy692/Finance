@@ -23,7 +23,7 @@ class PanelWidget(QFrame):
             }
         """)
 
-        self.setMinimumWidth(540)
+        self.setMinimumWidth(560)
 
         main_layout = QHBoxLayout()
         main_layout.setContentsMargins(15, 15, 15, 15)
@@ -32,13 +32,13 @@ class PanelWidget(QFrame):
         label_layout = QVBoxLayout()
 
         title_label = QLabel(title)
-        title_label.setFont(QFont('Inter', 20))
+        title_label.setFont(QFont('Inter Regular', 20))
         title_label.setStyleSheet(
             'color: #545454;'
         )
         
         value_label = QLabel('${:,.2f}'.format(value))
-        value_label.setFont(QFont('Inter', 28))
+        value_label.setFont(QFont('Inter Regular', 28))
         value_label.setStyleSheet(
             'color: black;'
         )
@@ -54,7 +54,7 @@ class PanelWidget(QFrame):
         icon_label.setPixmap(icon_pixmap)
 
         indicator = QLabel('0% vs last month')
-        indicator.setFont(QFont('Inter', 19))
+        indicator.setFont(QFont('Inter Regular', 19))
         indicator.setStyleSheet('color: #545454;')
 
         indicator_layout.addWidget(icon_label)

@@ -3,11 +3,12 @@ import os
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt as qt
 from PyQt6.QtCore import QSize
-from PyQt6.QtGui import QIcon, QGuiApplication
-from util.style_util import load_stylesheet
+from PyQt6.QtGui import QIcon, QGuiApplication, QFontDatabase, QColor
+from widgets.util.style_util import load_stylesheet
 from pages.transactions import TransactionsPage
 from typing import List
 from pages.dashboard import DashboardPage
+from widgets.components.separator import Separator
 
 class App(QMainWindow):
     def __init__(self, title: str, width=1600, height=1100) -> None:        
@@ -17,9 +18,12 @@ class App(QMainWindow):
         else:
             self.app = QApplication.instance() 
 
-        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
-
         super().__init__()
+
+        QFontDatabase.addApplicationFont('assets/fonts/Inter-Thin.ttf')
+        QFontDatabase.addApplicationFont('assets/fonts/Inter-Light.ttf')
+        QFontDatabase.addApplicationFont('assets/fonts/Inter-Regular.ttf')
+        QFontDatabase.addApplicationFont('assets/fonts/Inter-Medium.ttf')
 
         self.setWindowTitle(title)
         self.setGeometry(100, 100, width, height)
@@ -67,15 +71,7 @@ class App(QMainWindow):
             load_stylesheet('styles/sidebar.qss')
         )
 
-        separator = QFrame()
-        separator.setStyleSheet(
-            'background-color: #c8c8c8;'
-        )
-        separator.setFrameShape(QFrame.Shape.HLine)
-        separator.setFrameShadow(QFrame.Shadow.Sunken)
-        separator.setFixedWidth(frame.width())
-        separator.setFixedHeight(2)
-        sidebar.addWidget(separator)
+        sidebar.addWidget(Separator(color=QColor(200, 200, 200), height=1))
 
         sidebar.addSpacing(80) # Spacing below the separator
 
@@ -83,33 +79,34 @@ class App(QMainWindow):
         def create_button(name: str, icon: str, size: int) -> QPushButton:
             nonlocal idx
 
-            button = QPushButton(' ' * 3 + name)
-            button.setIcon(QIcon(icon))
-            button.setIconSize(QSize(size, size))
-            button.setLayoutDirection(qt.LayoutDirection.LeftToRight)
-            button.setFixedHeight(90)
+            btn = QPushButton(' ' * 3 + name)
+            btn.setIcon(QIcon(icon))
+            btn.setIconSize(QSize(size, size))
+            btn.setLayoutDirection(qt.LayoutDirection.LeftToRight)
+            btn.setFixedHeight(90)
+            btn.setCursor(qt.CursorShape.PointingHandCursor)
 
-            self.buttons.append(button)
-            button.clicked.connect(lambda _, index=idx: self._on_sidebar_button_clicked(index))
+            self.buttons.append(btn)
+            btn.clicked.connect(lambda _, index=idx: self._on_sidebar_button_clicked(index))
 
             idx += 1
 
-            return button
+            return btn
             
         sidebar.addWidget(
-            create_button('Dashboard', 'assets/dashboard.png', 48)
+            create_button('Dashboard', 'assets/icons/dashboard.png', 48)
         )
         sidebar.addWidget(
-            create_button('Transactions', 'assets/transactions.png', 48)
+            create_button('Transactions', 'assets/icons/transactions.png', 48)
         )
         sidebar.addWidget(
-            create_button('Budgets', 'assets/budgets.png', 48)
+            create_button('Budgets', 'assets/icons/budgets.png', 48)
         )
         sidebar.addWidget(
-            create_button('Insights', 'assets/insights.png', 48)
+            create_button('Insights', 'assets/icons/insights.png', 48)
         )
         sidebar.addWidget(
-            create_button('Investments', 'assets/investments.png', 48)
+            create_button('Investments', 'assets/icons/investments.png', 48)
         )
 
         sidebar.addStretch() # Push the buttons to the top

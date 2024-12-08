@@ -1,6 +1,6 @@
 QFrame#sidebar {
     background-color: #f8f8fa;
-    border-right: 2px solid #c8c8c8;
+    border-right: 1px solid #c8c8c8;
     margin: 0;
     padding: 0;
 }
@@ -10,7 +10,7 @@ QPushButton {
     background-color: transparent;
     border: 0px solid transparent;
     border-radius: 15px;
-    font-family: 'Inter Regular';
+    font-family: 'Inter Light';
     font-size: 29px;
     text-align: left;
     padding-left: 40px;

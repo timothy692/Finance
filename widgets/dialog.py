@@ -1,7 +1,9 @@
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt as qt, QSize, QPoint
-from PyQt6.QtGui import QIcon, QPixmap, QPainter, QBrush, QPen, QColor
-from util.style_util import load_stylesheet
+from PyQt6.QtGui import QIcon, QPixmap, QColor
+from widgets.util.style_util import load_stylesheet
+from widgets.util.drop_shadow import DropShadowEffect
+from widgets.components.separator import Separator
 
 class FramelessDialog(QDialog):
     def __init__(self, parent: QWidget, title: str, width: int, height: int):
@@ -21,17 +23,12 @@ class FramelessDialog(QDialog):
             load_stylesheet('styles/dialog.qss')
         )
 
+        self._padding = 40
+
         self._init_gui()
 
-        self._is_dragging = False
-        self._drag_position = QPoint()
-
-    def create_textbox(self, placeholder: str) -> QLineEdit:
-        tb = QLineEdit()
-        tb.setObjectName('textbox')
-        tb.setPlaceholderText(placeholder)
-        tb.setReadOnly(False)
-        return tb
+    def total_width(self) -> int:
+        return self.width() - self._padding*2
     
     def create_widget_label(self, text: str) -> QLabel:
         label = QLabel(text)
@@ -43,20 +40,6 @@ class FramelessDialog(QDialog):
         layout = QVBoxLayout()
         layout.setContentsMargins(0,0,0,0)
         
-        # Separator
-
-        separator_layout = QVBoxLayout()
-        separator_layout.setContentsMargins(0,0,0,0)
-
-        separator = QFrame()
-        separator.setFixedHeight(1)
-        separator.setStyleSheet(
-            'background-color: rgba(166, 166, 166, 250)'
-        )
-        separator.setFrameShape(QFrame.Shape.HLine)
-        separator.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(separator)
-
         # Top bar
 
         self.top_bar = QHBoxLayout()
@@ -66,6 +49,7 @@ class FramelessDialog(QDialog):
         title.setObjectName('title')
         
         close = QPushButton()
+        close.setCursor(qt.CursorShape.PointingHandCursor)
         close.setIcon(QIcon(
             QPixmap('assets/icons/close.png').scaled(21, 21, 
                                               qt.AspectRatioMode.KeepAspectRatio,
@@ -88,14 +72,38 @@ class FramelessDialog(QDialog):
         self.top_bar.addWidget(close, alignment=qt.AlignmentFlag.AlignRight)
         
         layout.addLayout(self.top_bar)
-        layout.addLayout(separator_layout)
-        layout.addStretch()
+        layout.addWidget(Separator())
 
         self.container = QVBoxLayout()
-        self.container.setContentsMargins(30,20,30,30)
+        self.container.setContentsMargins(self._padding,30,self._padding,self._padding)
         self.container.setSpacing(0)
 
         layout.addLayout(self.container, stretch=1)
+
+        bottom_bar_container = QWidget(self)
+        bottom_bar_container.setObjectName('bottom-bar')
+
+        self.bottom_bar = QHBoxLayout(bottom_bar_container)
+        self.bottom_bar.setContentsMargins(12,12,12,12)
+
+        cancel_btn = QPushButton('Cancel')
+        cancel_btn.setObjectName('cancel')
+        cancel_btn.setFixedSize(94, 40)
+        cancel_btn.setCursor(qt.CursorShape.PointingHandCursor)
+        effect = DropShadowEffect(color=QColor(166, 166, 166, 50), blur_radius=3, dy_offset=3)
+        effect.apply(cancel_btn, always_enable=True)
+
+        cancel_btn.clicked.connect(self.close) # Connect button click to closing dialog
+
+        save_btn = QPushButton('Save')
+        save_btn.setObjectName('save')
+        save_btn.setFixedSize(80, 40)
+        save_btn.setCursor(qt.CursorShape.PointingHandCursor)
+
+        self.bottom_bar.addWidget(cancel_btn, alignment=qt.AlignmentFlag.AlignLeft)
+        self.bottom_bar.addWidget(save_btn, alignment=qt.AlignmentFlag.AlignRight)
+
+        layout.addWidget(bottom_bar_container)
 
         self.setLayout(layout)
 

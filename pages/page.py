@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import *
-from util.style_util import load_stylesheet
-from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import QColor
+from widgets.util.style_util import load_stylesheet
+from widgets.components.separator import Separator
 
 class Page(QFrame):
     def __init__(self):
@@ -26,17 +27,17 @@ class Page(QFrame):
 
         # Separator layout
 
-        separator_layout = QVBoxLayout()
-        separator_layout.setContentsMargins(0,0,0,0)
+        # separator_layout = QVBoxLayout()
+        # separator_layout.setContentsMargins(0,0,0,0)
 
-        separator = QFrame()
-        separator.setFixedHeight(2)
-        separator.setStyleSheet(
-            'background-color: #c8c8c8;'
-        )
-        separator.setFrameShape(QFrame.Shape.HLine)
-        separator.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(separator)
+        # separator = QFrame()
+        # separator.setFixedHeight(2)
+        # separator.setStyleSheet(
+        #     'background-color: #c8c8c8;'
+        # )
+        # separator.setFrameShape(QFrame.Shape.HLine)
+        # separator.setFrameShadow(QFrame.Shadow.Sunken)
+        # separator_layout.addWidget(Separator(color=(QColor(200,200,200)), height=2))
 
         # Bottom layout
 
@@ -45,7 +46,7 @@ class Page(QFrame):
         self.layout_bottom.setSpacing(30)
 
         layout.addLayout(self.layout_top)
-        layout.addLayout(separator_layout)
+        layout.addWidget(Separator(color=(QColor(200,200,200)), height=1))
         layout.addLayout(self.layout_bottom, stretch=2)
 
         self._init_top_container()

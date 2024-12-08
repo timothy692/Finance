@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt as qt
 from PyQt6.QtCore import QSize, QAbstractTableModel
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QFont, QIcon, QColor
-from util.style_util import load_stylesheet
+from widgets.util.style_util import load_stylesheet
 from widgets.transaction_treeview import TransactionTreeview
 from widgets.transaction_dialog import TransactionDialog
 from models.tag import Tag
@@ -26,6 +26,7 @@ class TransactionsPage(Page):
             btn = QPushButton(label)
             btn.setObjectName(object_name)
             btn.setFixedSize(width, 48)
+            btn.setCursor(qt.CursorShape.PointingHandCursor)
 
             if icon:
                 btn.setIcon(QIcon(icon))

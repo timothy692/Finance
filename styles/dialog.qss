@@ -4,31 +4,43 @@ QDialog {
 }
 
 QLabel#title {
-    font-family: 'Inter';
     font-size: 24px;
+    font-family: 'Inter Medium';
     padding-left: 20px;
     color: black;
 }
 
 QLabel#widget-label {
-    font-family: 'Inter';
+    font-family: 'Inter Regular';
     font-size: 21px;
-    font-weight: 500;
     color: black;
 }
 
-QLineEdit#textbox {
+QWidget#bottom-bar {
+    background-color: #f8f8fa;
+    border: 1px solid #c6c6c6;
+    border-top: 1px solid rgba(166, 166, 166, 200);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+QPushButton#cancel {
     background-color: white;
-    border: 1px solid rgba(186, 186, 186, 200);
-    border-radius: 12px;
     color: black;
-    font-size: 22px;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-family: 'Inter';
+    font-size: 21px;
+    border: 1px solid rgba(166, 166, 166, 200);;
+    font-family: 'Inter Regular';
+    border-radius: 7px;
 }
 
-QLineEdit#textbox:focus {
-    border: 1px solid #3c40bc;
-    border-radius: 12px;
+QPushButton#save {
+    background-color: #3c40bc;
+    color: white;
+    font-size: 21px;
+    border: none;
+    font-family: 'Inter Regular';
+    border-radius: 7px;
+    padding-bottom: 2px;
 }

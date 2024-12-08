@@ -1,0 +1,60 @@
+QComboBox {
+    border: 1px solid #c6c6c6;
+    border-radius: 16px;
+    background-color: white;
+    color: black;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 20px;
+    font-family: 'Inter Regular';
+}
+
+QComboBox:focus {
+    border: 1px solid rgb(60, 64, 188);
+    border-radius: 16px;
+    background-color: white;
+    color: black;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 20px;
+    font-family: 'Inter Regular';
+}
+
+
+QComboBox:focus:open, QComboBox:on {
+    border: 1px solid rgb(60, 64, 188); /* Preserve white border when open */
+    border-radius: 16px;
+    background-color: white;
+    color: black;
+}
+
+QComboBox::drop-down {
+    background-color: white;
+    width: 40px;
+    border: none; 
+    margin: 5px;
+    border-radius: 0;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: green; /* Highlight color */
+    selection-color: black;
+    color: black;
+    border-radius: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+QComboBox::down-arrow {
+    image: url('assets/icons/arrow_down.png'); /* Default down arrow */
+    width: 18px;
+    height: 18px;
+}
+
+QComboBox::down-arrow:on {
+    image: url('assets/icons/arrow_up.png'); /* Up arrow when open */
+    width: 18px;
+    height: 18px;
+}

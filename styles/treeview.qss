@@ -1,6 +1,6 @@
 QTreeView {                         /* Rows and content */
     background-color: white; 
-    font-family: 'Inter';
+    font-family: 'Inter Regular';
     color: black;
     border: none;
     font-size: 25px;
@@ -21,7 +21,7 @@ QHeaderView {                       /* Header */
 QHeaderView::section {              /* Header */
     background-color: #f8f8fa;
     color: #545454;
-    font-family: 'Inter';
+    font-family: 'Inter Regular';
     font-size: 25px; 
     border: none;                   /* TODO: fix border edge bug */
     /* border: 1px solid #f8f8fa;

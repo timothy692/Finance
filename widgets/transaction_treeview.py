@@ -26,7 +26,7 @@ class TagDelegate(QStyledItemDelegate):
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        font = QFont("Inter", 18)
+        font = QFont("Inter Regular", 18)
         painter.setFont(font)
 
         padding = 14 # Increase padding for more spacing around the text
@@ -104,13 +104,6 @@ class TransactionTableModel(QAbstractTableModel):
         # Green foreground for positive values in amount column
         if role == qt.ItemDataRole.ForegroundRole and col == 2:
             return QColor('black') if value < 0 else QColor('green')
-        
-        # Different font weight for amount column 
-        if role == qt.ItemDataRole.FontRole:
-            font = QFont('Inter')
-            font.setWeight(QFont.Weight.Medium) if col == 2 else font.setWeight(QFont.Weight.Thin)
-            
-            return font
         
         return None
     
