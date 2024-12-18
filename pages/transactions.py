@@ -6,8 +6,8 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QFont, QIcon, QColor
 from widgets.util.style_util import load_stylesheet
 from widgets.transaction_treeview import TransactionTreeview
-from widgets.transaction_dialog import TransactionDialog
-from models.tag import Tag
+from widgets.dialogs.add_transaction import TransactionDialog
+from models.tag import TagManager
 
 class TransactionsPage(Page):
     def __init__(self):
@@ -78,30 +78,19 @@ class TransactionsPage(Page):
 
         # Transaction treeview
 
-        tags = {
-            'basic': Tag(text="Basic", background_color=QColor(224, 247, 255, 150), text_color=QColor("#1F509A")),
-            'must-have': Tag(text="Must have", background_color=QColor("#FFE0E0"), text_color=QColor("#AF1740")),
-            'income': Tag(text="Income", background_color=QColor("#E8F5E9"), text_color=QColor("#2E7D32")),
-            'sport': Tag(text="Sport", background_color=QColor("#F5E0FF"), text_color=QColor("#7B1FA2")),
-            'health': Tag(text="Health", background_color=QColor("#E0F7FF"), text_color=QColor("#017B92")),
-            'food': Tag(text="Food", background_color=QColor("#F5F5F5"), text_color=QColor("#545454")),
-            'entertainment': Tag(text="Entertainment", background_color=QColor("#FFF2E0"), text_color=QColor("#BF360C")),
-        }
-
-        treeview = TransactionTreeview(tags.values())
+        treeview = TransactionTreeview([]) # TODO: add tags
 
         treeview.setStyleSheet(
             load_stylesheet('styles/treeview.qss')
         )
 
-        treeview.add_entry(
-            ["19.02.2024", "New Transaction", 42, [tags.get('entertainment'), tags.get('income')], "New Account"],
-        )
+        # treeview.add_entry(
+        #     ["19.02.2024", "New Transaction", 42, [self.tags.get('entertainment'), self.tags.get('income')], "New Account"],
+        # )
 
-        treeview.add_entry(
-            ["19.10.2024", "New Transaction", -90, [tags.get('basic')], "New Account"]
-        )
+        # treeview.add_entry(
+        #     ["19.10.2024", "New Transaction", -90, [self.tags.get('basic')], "New Account"]
+        # )
 
         treeview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.layout_bottom.addWidget(treeview)
-

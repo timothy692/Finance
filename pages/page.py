@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QColor
 from widgets.util.style_util import load_stylesheet
 from widgets.components.separator import Separator
+from models.tag import TagManager
 
 class Page(QFrame):
     def __init__(self):
@@ -24,20 +25,6 @@ class Page(QFrame):
         frame.setFixedHeight(70)
         frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.layout_top.addWidget(frame)
-
-        # Separator layout
-
-        # separator_layout = QVBoxLayout()
-        # separator_layout.setContentsMargins(0,0,0,0)
-
-        # separator = QFrame()
-        # separator.setFixedHeight(2)
-        # separator.setStyleSheet(
-        #     'background-color: #c8c8c8;'
-        # )
-        # separator.setFrameShape(QFrame.Shape.HLine)
-        # separator.setFrameShadow(QFrame.Shadow.Sunken)
-        # separator_layout.addWidget(Separator(color=(QColor(200,200,200)), height=2))
 
         # Bottom layout
 

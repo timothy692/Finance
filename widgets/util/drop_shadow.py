@@ -46,13 +46,18 @@ class DropShadowEffect(QObject):
     def register_events(self, events: List[QEvent.Type]) -> None:
         self._trigger_events.extend(events)
 
+    def enable(self) -> None:
+        self.effect.setBlurRadius(self._blur_radius)
+
+    def disable(self) -> None:
+        self.effect.setBlurRadius(0)
+
     def eventFilter(self, obj, event):
         if obj == self._parent and len(self._trigger_events) > 0:
             # Enable / disable effect by changing blur radius
             if event.type() in self._trigger_events:
-                self.effect.setBlurRadius(self._blur_radius)
+                self.enable()
             elif event.type() in self._inverse_events.values():
-                self.effect.setBlurRadius(0)
-            
+                self.disable()
             
         return super().eventFilter(obj, event)

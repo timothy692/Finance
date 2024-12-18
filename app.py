@@ -18,6 +18,8 @@ class App(QMainWindow):
         else:
             self.app = QApplication.instance() 
 
+        QApplication.setStyle('Fusion')
+
         super().__init__()
 
         QFontDatabase.addApplicationFont('assets/fonts/Inter-Thin.ttf')

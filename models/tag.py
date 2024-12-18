@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 from PyQt6.QtGui import QColor
-import logging
+from db import database
 from typing import List
+import logging
 
 @dataclass
 class Tag:
     text: str
-    background_color: QColor
-    text_color: QColor
+    background: QColor
+    foreground: QColor
 
     def is_valid(self) -> bool:
         return len(self.text) <= 16
@@ -16,20 +17,29 @@ class TagManager:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
-        self._tags = List[Tag]
+        self._tags = None
+
+        if database.is_connected():
+           tags = database.get_tags()
+
+           self._tags = { tag['key']: Tag(
+                text=tag['content'],
+                background=QColor(tag['background']),
+                foreground=QColor(tag['foreground'])
+            ) for tag in tags }
+        else:
+            self.logger.warning('Database is disconnected, tags were not initialized')
+
+    def all(self) -> List[Tag]:
+        """
+        Returns all tags in the database
+        """
+
+        return list(self._tags.values())
     
-    def add_tag(self, tag: Tag) -> bool:
-        if tag.is_valid():
-            self._tags.append(tag)
+    def get_tag(self, key: str) -> None:
+        """
+        Gets a tag with the specified key, if none can be found None is returned
+        """
 
-        return tag.is_valid()
-
-    def add_tags(self, tags: List[Tag]) -> None:
-        valids = [tag for tag in tags if tag.is_valid()]
-
-        self._tags.extend(valids)
-        if len(valids) != len(tags):
-            self.logger.warning(f'{len(tags)-len(valids)} tags were invalid and not added!')
-
-    def tags(self) -> List[Tag]:
-        return self._tags 
+        return self._tags.get(key)

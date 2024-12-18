@@ -3,7 +3,6 @@ from PyQt6.QtCore import Qt as qt
 import logging
 import os
 from app import App
-from db import Database
 
 def initLogger():
     logging.basicConfig(
@@ -19,10 +18,8 @@ os.environ["QT_SCALE_FACTOR"]           = "0.7"
 
 if __name__ == '__main__':
     initLogger()
-    
-    # db = Database()
-    
-    # db.add_transaction(100.0, 'Description', 1000.0, None)
+        
+    # db.add_transaction('09.08.2023 13:42', 'Test', 100.0, 100.0, ['Food'], 'Credit Card')
 
     # Init app
     app = App('Expense Tracker')
