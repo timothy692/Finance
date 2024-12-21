@@ -1,45 +1,63 @@
-from .dialog import FramelessDialog
-from PyQt6.QtCore import Qt as qt, QSize
+from PyQt6.QtCore import QSize
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import (QColor, QColorConstants, QDoubleValidator, QIcon,
+                         QValidator)
 from PyQt6.QtWidgets import *
-from PyQt6.QtGui import QDoubleValidator, QValidator, QIcon, QColor
-from widgets.components.input import Input
-from widgets.components.combobox import ComboBox
-from widgets.util.drop_shadow import DropShadowEffect
-from widgets.layouts.flowlayout import FlowLayout
-from widgets.util.style_util import load_stylesheet
+
 from models.tag import Tag, TagManager
+from widgets.components.combobox import ComboBox
+from widgets.components.input import Input
+from widgets.layouts.flowlayout import FlowLayout
+from widgets.util.drop_shadow import DropShadowEffect
+from widgets.util.style_util import load_stylesheet
+
+from .dialog import FramelessDialog
+
 
 class TransactionDialog(FramelessDialog):
     def __init__(self, parent: QWidget):
+        self._selector_idx = -1 # Selector index for add item in flow layout
+        self._menu_items = None
+
         super().__init__(parent, 'Add Transaction', 600, 750)
+
+    def init(self):
+        self.container.setSpacing(25)
 
         description_input = Input('Description', self.total_width(), effect=DropShadowEffect()) \
                             .add_input_label('Description').build()
-        description_input.setAlignment(qt.AlignmentFlag.AlignTop)
+
+        self.container.addLayout(description_input)
 
         amount_input = Input('Amount', self.total_width(), effect=DropShadowEffect()) \
                             .add_input_label('Amount')
-        amount_input.setAlignment(qt.AlignmentFlag.AlignTop)
-        self.amount_textbox = amount_input.get_textbox()
+        
+        self.container.addLayout(amount_input.build())
 
-        self.amount_textbox.textChanged.connect(self._on_text_changed)
-        self.amount_textbox.cursorPositionChanged.connect(self._on_cursor_position_changed)
+        self._amount_tb = amount_input.get_textbox()
+        self._amount_tb.textChanged.connect(self._on_text_changed)
+        self._amount_tb.cursorPositionChanged.connect(self._on_cursor_position_changed)
 
-        # Layout for tags (label, combobox)
+        # Layout for tags (label, flow layout)
+
         tag_layout = QVBoxLayout()
         tag_layout.setSpacing(0)
+
         tag_label = QLabel('Select tags')
         tag_label.setStyleSheet(
-            load_stylesheet('styles/components/input.qss') # Re-use qlabel style from input component
-            + 'QLabel { padding-bottom: 7px; }'
+            load_stylesheet('styles/components/input.qss') + # Re-use qlabel style from input component
+
+            '''
+            QLabel 
+            { 
+                padding-bottom: 7px; 
+            }
+            '''
         )
         
-        tag_combobox = ComboBox('Select tags', self.total_width(), 56, effect=DropShadowEffect())
-
-        # Flow layout
-
-        flow_container = QFrame()
+        flow_container = QFrame() # Frame for the flow layout to customize border
         flow_container.setObjectName('container')
+        flow_container.setFixedWidth(self.total_width()-8)
         flow_container.setStyleSheet(
             '''
             QFrame#container {
@@ -49,45 +67,85 @@ class TransactionDialog(FramelessDialog):
             }   
             '''
         )
+        flow_layout = FlowLayout() 
+        flow_container.setLayout(flow_layout) # Flow container's layout is set to flow layout
 
-        flow_layout = FlowLayout()
-        flow_layout.setContentsMargins(20,20,20,20)
+        self.move_selector(flow_layout)
 
-        flow_container.setFixedWidth(self.total_width()-8)
-        flow_container.setLayout(flow_layout)
+        tag_layout.addWidget(tag_label)
+        tag_layout.addWidget(flow_container)
 
-        tm = TagManager()
-        for i in range(0,5):
-            flow_layout.addWidget(self.create_tag(tm.all()[i]))
-
-        tag_layout.addWidget(tag_label, alignment=qt.AlignmentFlag.AlignLeft)
-        tag_layout.addWidget(tag_combobox, alignment=qt.AlignmentFlag.AlignHCenter)
-
-        self.container.setSpacing(25)
-
-        self.container.addLayout(description_input)
-        self.container.addLayout(amount_input.build())
         self.container.addLayout(tag_layout)
-
-        self.container.addWidget(flow_container, alignment=qt.AlignmentFlag.AlignHCenter)
         self.container.addStretch()
 
-    def create_tag(self, tag: Tag) -> QFrame:
+    def add_tag(self, tag: Tag, flow_layout: FlowLayout) -> None:
+        tag_frame = self._create_tag_frame(tag.text, tag.foreground)
+        flow_layout.addWidget(tag_frame)
+
+        self.move_selector(flow_layout) # Move the selector to the end
+
+    def move_selector(self, flow_layout: FlowLayout) -> None:
+        if self._selector_idx != -1:
+            item = flow_layout.takeAt(self._selector_idx)
+            if item and item.widget():
+                item.widget().setParent(None) # Remove the old selector visually
+        
+        # Add the new selector at the end
+        selector = self._create_selector_frame()
+        flow_layout.addWidget(selector)
+
+        # Attaching the child button to the click event function
+        btn = selector.findChild(QPushButton)
+        btn.clicked.connect(self._selector_click_event)
+        
+        # Update the selector index to the new end
+        self._selector_idx = flow_layout.count()-1
+
+    def _selector_click_event(self) -> None:
+        menu = QMenu()
+
+        menu.addAction()
+
+    def _create_selector_frame(self) -> QFrame:
+        container = QFrame()
+        container.setFixedHeight(25)
+        container.setContentsMargins(0,3,0,0)
+
+        selector = QPushButton('+')
+        selector.setCursor(qt.CursorShape.PointingHandCursor)
+        selector.setStyleSheet(
+            '''
+            QPushButton, QPushButton:hover, QPushButton:pressed {
+                background-color: transparent;
+                color: black;
+                border: none;
+                font-family: 'Inter Regular';
+                font-size: 30px;
+            }
+            '''
+        )
+
+        layout = QHBoxLayout(container)
+        layout.addWidget(selector)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(selector, qt.AlignmentFlag.AlignVCenter | qt.AlignmentFlag.AlignHCenter)
+
+        return container
+
+    def _create_tag_frame(self, text: str, foreground: QColor) -> QFrame:
         """
         Creates a tag frame to be added to the flow layout
         """
-
-        fg = tag.foreground
 
         container = QFrame()
         container.setFixedHeight(44)
         container.setContentsMargins(4,0,2,0)
         container.setStyleSheet(
-            f'''
-            QFrame {{
-                border-radius: {44//2}px;
+            '''
+            QFrame {
+                border-radius: 22px;
                 border: 1px solid #D3D3D3;
-            }}
+            }
             '''
         )
 
@@ -99,7 +157,7 @@ class TransactionDialog(FramelessDialog):
         dot.setStyleSheet(
             f'''
             QWidget {{
-                background-color: {fg.name()};
+                background-color: {foreground.name()};
                 border-radius: 6px;
             }}
             '''
@@ -108,10 +166,10 @@ class TransactionDialog(FramelessDialog):
         dropshadow = DropShadowEffect(QColor(211,211,211,200), blur_radius=20)
         dropshadow.apply(parent=container, always_enable=True)
 
-        label = QLabel(' ' + tag.text)
+        label = QLabel(' ' + text)
         label.setContentsMargins(6,3,6,3)
         label.setStyleSheet(
-            f'''
+            '''
             font-family: 'Inter Regular';
             font-size: 19px;
             color: black;
@@ -122,6 +180,7 @@ class TransactionDialog(FramelessDialog):
         btn = QPushButton()
         btn.setIcon(QIcon('assets/icons/x.png'))
         btn.setIconSize(QSize(24,24))
+        btn.setCursor(qt.CursorShape.PointingHandCursor)
         btn.setStyleSheet(
             '''
             QPushButton, QPushButton:hover, QPushButton:pressed {
@@ -139,12 +198,16 @@ class TransactionDialog(FramelessDialog):
         container.setLayout(layout)
         return container
 
-    def _on_cursor_position_changed(self, old, new) -> None:
+    def _on_cursor_position_changed(self, _, new) -> None:
         if new < 2:
-            self.amount_textbox.setCursorPosition(2)
+            self._amount_tb.setCursorPosition(2)
 
     def _on_text_changed(self, text: str) -> None:
-        tb = self.amount_textbox
+        """
+        Amount validator logic
+        """
+
+        tb = self._amount_tb
 
         tb.textChanged.disconnect(self._on_text_changed)
 

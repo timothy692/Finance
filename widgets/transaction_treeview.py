@@ -1,8 +1,12 @@
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt as qt, QAbstractTableModel, QModelIndex, QRectF
-from PyQt6.QtGui import QPainter, QFont, QColor, QPen
-from models.tag import Tag
 from typing import List
+
+from PyQt6.QtCore import QAbstractTableModel, QModelIndex, QRectF
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import QColor, QFont, QPainter, QPen
+from PyQt6.QtWidgets import *
+
+from models.tag import Tag
+
 
 class PaddingDelegate(QStyledItemDelegate):
     def paint(self, painter: QPainter, option, index):

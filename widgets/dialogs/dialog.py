@@ -1,9 +1,12 @@
+from PyQt6.QtCore import QPoint, QSize
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import QColor, QIcon, QPixmap
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt as qt, QSize, QPoint
-from PyQt6.QtGui import QIcon, QPixmap, QColor
-from widgets.util.style_util import load_stylesheet
-from widgets.util.drop_shadow import DropShadowEffect
+
 from widgets.components.separator import Separator
+from widgets.util.drop_shadow import DropShadowEffect
+from widgets.util.style_util import load_stylesheet
+
 
 class FramelessDialog(QDialog):
     def __init__(self, parent: QWidget, title: str, width: int, height: int):
@@ -26,6 +29,7 @@ class FramelessDialog(QDialog):
         self._padding = 40
 
         self._init_gui()
+        self.init()
 
     def total_width(self) -> int:
         return self.width() - self._padding*2
@@ -35,6 +39,13 @@ class FramelessDialog(QDialog):
         label.setObjectName('widget-label')
         label.setFixedHeight(25)
         return label
+    
+    def init(self) -> None: 
+        """
+        Initialize the content of the dialog, must be overridden
+        """
+        
+        pass
 
     def _init_gui(self) -> None:
         layout = QVBoxLayout()

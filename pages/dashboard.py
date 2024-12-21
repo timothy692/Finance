@@ -1,5 +1,6 @@
 from pages.page import Page
 
+
 class DashboardPage(Page):
     def __init__(self):
         super().__init__()

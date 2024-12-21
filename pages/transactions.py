@@ -1,13 +1,15 @@
-from pages.page import Page
-from widgets.panel import PanelWidget
+from PyQt6.QtCore import QAbstractTableModel, QSize
 from PyQt6.QtCore import Qt as qt
-from PyQt6.QtCore import QSize, QAbstractTableModel
+from PyQt6.QtGui import QColor, QFont, QIcon
 from PyQt6.QtWidgets import *
-from PyQt6.QtGui import QFont, QIcon, QColor
-from widgets.util.style_util import load_stylesheet
-from widgets.transaction_treeview import TransactionTreeview
-from widgets.dialogs.add_transaction import TransactionDialog
+
 from models.tag import TagManager
+from pages.page import Page
+from widgets.dialogs.add_transaction import TransactionDialog
+from widgets.panel import PanelWidget
+from widgets.transaction_treeview import TransactionTreeview
+from widgets.util.style_util import load_stylesheet
+
 
 class TransactionsPage(Page):
     def __init__(self):

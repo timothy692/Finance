@@ -1,6 +1,9 @@
-from PyQt6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy
-from PyQt6.QtCore import Qt as qt, QRectF
-from PyQt6.QtGui import QFont, QPainter, QColor, QPixmap, QIcon
+from PyQt6.QtCore import QRectF
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
+from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSizePolicy,
+                             QVBoxLayout)
+
 
 class PanelWidget(QFrame):
     def __init__(self, title: str, value: float):

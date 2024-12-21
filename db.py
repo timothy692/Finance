@@ -1,7 +1,8 @@
-import sqlite3 as sql
-from typing import List, Dict
-from datetime import datetime
 import logging
+import sqlite3 as sql
+from datetime import datetime
+from typing import Dict, List
+
 
 class Database:
     def __init__(self, db_name='database.db'):

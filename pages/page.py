@@ -1,8 +1,10 @@
-from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QColor
-from widgets.util.style_util import load_stylesheet
-from widgets.components.separator import Separator
+from PyQt6.QtWidgets import *
+
 from models.tag import TagManager
+from widgets.components.separator import Separator
+from widgets.util.style_util import load_stylesheet
+
 
 class Page(QFrame):
     def __init__(self):

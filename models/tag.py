@@ -1,8 +1,11 @@
-from dataclasses import dataclass
-from PyQt6.QtGui import QColor
-from db import database
-from typing import List
 import logging
+from dataclasses import dataclass
+from typing import List
+
+from PyQt6.QtGui import QColor
+
+from db import database
+
 
 @dataclass
 class Tag:

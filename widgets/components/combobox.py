@@ -1,8 +1,12 @@
-from PyQt6.QtWidgets import QComboBox, QStyledItemDelegate, QApplication, QStyle, QStyleOptionViewItem, QAbstractScrollArea
-from PyQt6.QtGui import QPalette, QPainter, QColor, QFont, QPainterPath
-from PyQt6.QtCore import Qt as qt, QEvent, QSize, QModelIndex, QRectF, QPoint, QPointF
+from PyQt6.QtCore import QEvent, QModelIndex, QPoint, QPointF, QRectF, QSize
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import QColor, QFont, QPainter, QPainterPath, QPalette
+from PyQt6.QtWidgets import (QAbstractScrollArea, QApplication, QComboBox,
+                             QStyle, QStyledItemDelegate, QStyleOptionViewItem)
+
 from widgets.util.drop_shadow import DropShadowEffect
 from widgets.util.style_util import load_stylesheet
+
 
 class ComboBoxItemDelegate(QStyledItemDelegate):
     def __init__(self, height, parent=None):

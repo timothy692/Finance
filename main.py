@@ -1,8 +1,11 @@
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import Qt as qt
 import logging
 import os
+
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtWidgets import QApplication
+
 from app import App
+
 
 def initLogger():
     logging.basicConfig(

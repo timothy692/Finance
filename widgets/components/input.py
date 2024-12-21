@@ -1,9 +1,13 @@
 from __future__ import annotations
-from PyQt6.QtWidgets import QLineEdit, QGraphicsDropShadowEffect, QFrame, QLabel, QVBoxLayout, QLayout
+
 from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import (QFrame, QGraphicsDropShadowEffect, QLabel,
+                             QLayout, QLineEdit, QVBoxLayout)
+
 from widgets.util.drop_shadow import DropShadowEffect
 from widgets.util.style_util import load_stylesheet
+
 
 class Input(QVBoxLayout):
     def __init__(self, placeholder: str, width: int, effect: DropShadowEffect=None) -> None:

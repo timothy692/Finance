@@ -1,14 +1,17 @@
-import sys
 import os
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt as qt
-from PyQt6.QtCore import QSize
-from PyQt6.QtGui import QIcon, QGuiApplication, QFontDatabase, QColor
-from widgets.util.style_util import load_stylesheet
-from pages.transactions import TransactionsPage
+import sys
 from typing import List
+
+from PyQt6.QtCore import QSize
+from PyQt6.QtCore import Qt as qt
+from PyQt6.QtGui import QColor, QFontDatabase, QGuiApplication, QIcon
+from PyQt6.QtWidgets import *
+
 from pages.dashboard import DashboardPage
+from pages.transactions import TransactionsPage
 from widgets.components.separator import Separator
+from widgets.util.style_util import load_stylesheet
+
 
 class App(QMainWindow):
     def __init__(self, title: str, width=1600, height=1100) -> None:        

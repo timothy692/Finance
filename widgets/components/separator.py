@@ -1,7 +1,9 @@
-from PyQt6.QtWidgets import QFrame
-from PyQt6.QtGui import QColor
 from PyQt6.QtCore import QMargins
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QFrame
+
 from widgets.util.style_util import load_stylesheet
+
 
 class Separator(QFrame):
     def __init__(self, color=QColor(166, 166, 166, 250), height=1):

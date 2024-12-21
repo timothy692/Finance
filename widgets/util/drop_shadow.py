@@ -1,7 +1,9 @@
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget
-from PyQt6.QtGui import QColor
-from PyQt6.QtCore import QObject, QEvent
 from typing import List
+
+from PyQt6.QtCore import QEvent, QObject
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget
+
 
 class DropShadowEffect(QObject):
     def __init__(self, color=QColor(60, 64, 188, 100), blur_radius=20, dy_offset=0):

@@ -1,5 +1,6 @@
+from PyQt6.QtCore import QPoint, QRect, QSize
 from PyQt6.QtWidgets import QLayout, QSizePolicy, QWidgetItem
-from PyQt6.QtCore import QSize, QRect, QPoint
+
 
 class FlowLayout(QLayout):
     def __init__(self, parent=None, spacing=10):
@@ -28,7 +29,11 @@ class FlowLayout(QLayout):
     def takeAt(self, index):
         """Remove and return the item at a specific index."""
         if 0 <= index < len(self._items):
-            return self._items.pop(index)
+            item = self._items.pop(index)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)  # Detach the widget from its parent
+            return item
         return None
 
     def setGeometry(self, rect):
