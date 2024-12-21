@@ -2,7 +2,7 @@ from PyQt6.QtCore import QMargins
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QFrame
 
-from widgets.util.style_util import load_stylesheet
+from widgets.util.styleUtil import load_stylesheet
 
 
 class Separator(QFrame):

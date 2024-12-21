@@ -1,23 +1,56 @@
-from PyQt6.QtCore import QSize
+from typing import Dict, List
+from functools import partial
+
+from PyQt6.QtGui import QIcon, QColor, QPixmap, QPainter, QValidator,  QDoubleValidator
 from PyQt6.QtCore import Qt as qt
-from PyQt6.QtGui import (QColor, QColorConstants, QDoubleValidator, QIcon,
-                         QValidator)
+from PyQt6.QtCore import QSize, QPoint
 from PyQt6.QtWidgets import *
 
 from models.tag import Tag, TagManager
-from widgets.components.combobox import ComboBox
+from widgets.util.styleUtil import load_stylesheet
+from widgets.util.dropshadow import DropShadowEffect
 from widgets.components.input import Input
 from widgets.layouts.flowlayout import FlowLayout
-from widgets.util.drop_shadow import DropShadowEffect
-from widgets.util.style_util import load_stylesheet
+from widgets.components.combobox import ComboBox
 
 from .dialog import FramelessDialog
 
 
 class TransactionDialog(FramelessDialog):
     def __init__(self, parent: QWidget):
-        self._selector_idx = -1 # Selector index for add item in flow layout
-        self._menu_items = None
+        self._last_selector_idx = -1 # Selector index for add item in flow layout
+        self._added_tags: Dict[str, int] = dict()
+
+        self._tag_menu = QMenu()
+        self._tag_menu.setFixedWidth(300)
+
+        self._tag_menu.setStyleSheet(
+            '''
+            QMenu {
+                background-color: white;
+                border: 1px solid #c6c6c6;
+                border-radius: 16px;
+                padding: 8px;
+            }
+
+            QMenu::item {
+                color: black;
+                background-color: transparent;
+                font-family: 'Inter Regular';
+                font-size: 21px;
+                padding-left: 20px;
+                height: 40px;
+                border-radius: 8px;
+            }
+
+            QMenu::item:selected {
+                background-color: #f8f8fa; 
+                border: none;
+                border-radius: 8px;
+            }
+            '''
+        )
+        self._tags = TagManager().all()
 
         super().__init__(parent, 'Add Transaction', 600, 750)
 
@@ -67,10 +100,10 @@ class TransactionDialog(FramelessDialog):
             }   
             '''
         )
-        flow_layout = FlowLayout() 
-        flow_container.setLayout(flow_layout) # Flow container's layout is set to flow layout
+        self.flow_layout = FlowLayout() 
+        flow_container.setLayout(self.flow_layout) # Flow container's layout is set to flow layout
 
-        self.move_selector(flow_layout)
+        self.move_selector()
 
         tag_layout.addWidget(tag_label)
         tag_layout.addWidget(flow_container)
@@ -78,33 +111,106 @@ class TransactionDialog(FramelessDialog):
         self.container.addLayout(tag_layout)
         self.container.addStretch()
 
-    def add_tag(self, tag: Tag, flow_layout: FlowLayout) -> None:
+    def add_tag(self, tag: Tag) -> None:
         tag_frame = self._create_tag_frame(tag.text, tag.foreground)
-        flow_layout.addWidget(tag_frame)
+        btn = tag_frame.findChild(QPushButton)
 
-        self.move_selector(flow_layout) # Move the selector to the end
+        idx = self.flow_layout.count()  # Current count before adding the tag
+        self._added_tags[btn.objectName()] = idx
+        btn.clicked.connect(partial(self._handle_tag_click, idx))
 
-    def move_selector(self, flow_layout: FlowLayout) -> None:
-        if self._selector_idx != -1:
-            item = flow_layout.takeAt(self._selector_idx)
+        self.flow_layout.addWidget(tag_frame)
+
+        print(f'Added tag, moving selector to idx {idx + 1}')
+        self.move_selector()
+
+
+        print('added tag, moved selector from idx',self._last_selector_idx,'to',idx+1)
+        self.move_selector(self._last_selector_idx, idx+1) 
+
+    def move_selector(self) -> None:
+        # Remove the existing selector if it exists
+        if self._last_selector_idx != -1:
+            item = self.flow_layout.takeAt(self._last_selector_idx)
             if item and item.widget():
-                item.widget().setParent(None) # Remove the old selector visually
-        
-        # Add the new selector at the end
+                item.widget().setParent(None)
+
+        # Add the selector at the end
         selector = self._create_selector_frame()
-        flow_layout.addWidget(selector)
+        self.flow_layout.addWidget(selector)
 
-        # Attaching the child button to the click event function
         btn = selector.findChild(QPushButton)
-        btn.clicked.connect(self._selector_click_event)
+        btn.co
+
+        # Update the selector index to the last position
+        self._last_selector_idx = self.flow_layout.count() - 1
+        print(f'Moved selector to idx {self._last_selector_idx}')
+                
+    def _selector_menu(self) -> None:
+        if len(self._tag_menu.actions()) > 0:
+            self._tag_menu.clear()
+
+        def icon_pixmap(color: str, size: int, padding: int) -> QPixmap:
+            """
+            Create a QPixmap with a colored dot
+            """
+
+            pixmap = QPixmap(size + padding, size) # Horizontal padding
+            pixmap.fill(QColor(0, 0, 0, 0))
+
+            painter = QPainter(pixmap)
+            painter.setBrush(QColor(color))
+            painter.setPen(qt.PenStyle.NoPen)
+
+            # Draw the dot shifted to the right
+            painter.drawEllipse(padding, 0, size, size)
+            painter.end()
+
+            return pixmap
         
-        # Update the selector index to the new end
-        self._selector_idx = flow_layout.count()-1
+        for item in self._tags:
+            action = self._tag_menu.addAction(item.text)
+            action.setIcon(QIcon(icon_pixmap(item.foreground, 18, padding=15)))
 
-    def _selector_click_event(self) -> None:
-        menu = QMenu()
+            action.triggered.connect(lambda checked, t=item.text: self._handle_menu_click(t))
 
-        menu.addAction()
+        btn = self.sender()
+        pos = btn.mapToGlobal(QPoint(0, btn.height()))
+        self._tag_menu.exec(pos)
+    
+    def _handle_menu_click(self, text: str) -> None:
+        for item in self._tags:
+            if item.text == text:
+                # Remove the tag from the tag list to prevent duplicate tags
+                self._tags.remove(item)   
+
+                # Add the tag to the flow layout
+                self.add_tag(item)
+
+    def _handle_tag_click(self, index: int) -> None:
+        # Remove the tag widget at the given index
+        item = self.flow_layout.takeAt(index)
+        if item and item.widget():
+            item.widget().setParent(None)
+
+        # Update `_added_tags` to reflect the removal
+        tag_to_remove = None
+        for tag, idx in self._added_tags.items():
+            if idx == index:
+                tag_to_remove = tag
+                break
+
+        if tag_to_remove:
+            del self._added_tags[tag_to_remove]
+
+        # Shift the indices of remaining tags
+        for tag, idx in self._added_tags.items():
+            if idx > index:
+                self._added_tags[tag] = idx - 1
+
+        # Reposition the selector
+        print(f'Removed tag at idx {index}, repositioning selector')
+        self.move_selector()
 
     def _create_selector_frame(self) -> QFrame:
         container = QFrame()
@@ -132,7 +238,7 @@ class TransactionDialog(FramelessDialog):
 
         return container
 
-    def _create_tag_frame(self, text: str, foreground: QColor) -> QFrame:
+    def _create_tag_frame(self, tag: Tag) -> QFrame:
         """
         Creates a tag frame to be added to the flow layout
         """
@@ -157,7 +263,7 @@ class TransactionDialog(FramelessDialog):
         dot.setStyleSheet(
             f'''
             QWidget {{
-                background-color: {foreground.name()};
+                background-color: {tag.foreground.name()};
                 border-radius: 6px;
             }}
             '''
@@ -166,7 +272,7 @@ class TransactionDialog(FramelessDialog):
         dropshadow = DropShadowEffect(QColor(211,211,211,200), blur_radius=20)
         dropshadow.apply(parent=container, always_enable=True)
 
-        label = QLabel(' ' + text)
+        label = QLabel(' ' + tag.text)
         label.setContentsMargins(6,3,6,3)
         label.setStyleSheet(
             '''
@@ -179,6 +285,7 @@ class TransactionDialog(FramelessDialog):
 
         btn = QPushButton()
         btn.setIcon(QIcon('assets/icons/x.png'))
+        btn.setProperty('key', tag.key)
         btn.setIconSize(QSize(24,24))
         btn.setCursor(qt.CursorShape.PointingHandCursor)
         btn.setStyleSheet(

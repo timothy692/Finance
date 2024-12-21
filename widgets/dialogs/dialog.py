@@ -4,8 +4,8 @@ from PyQt6.QtGui import QColor, QIcon, QPixmap
 from PyQt6.QtWidgets import *
 
 from widgets.components.separator import Separator
-from widgets.util.drop_shadow import DropShadowEffect
-from widgets.util.style_util import load_stylesheet
+from widgets.util.dropshadow import DropShadowEffect
+from widgets.util.styleUtil import load_stylesheet
 
 
 class FramelessDialog(QDialog):

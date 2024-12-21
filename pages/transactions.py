@@ -5,10 +5,10 @@ from PyQt6.QtWidgets import *
 
 from models.tag import TagManager
 from pages.page import Page
-from widgets.dialogs.add_transaction import TransactionDialog
+from widgets.dialogs.addTransaction import TransactionDialog
 from widgets.panel import PanelWidget
-from widgets.transaction_treeview import TransactionTreeview
-from widgets.util.style_util import load_stylesheet
+from widgets.transactionTreeview import TransactionTreeview
+from widgets.util.styleUtil import load_stylesheet
 
 
 class TransactionsPage(Page):

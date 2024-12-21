@@ -9,6 +9,7 @@ from db import database
 
 @dataclass
 class Tag:
+    key: str,
     text: str
     background: QColor
     foreground: QColor
@@ -26,6 +27,7 @@ class TagManager:
            tags = database.get_tags()
 
            self._tags = { tag['key']: Tag(
+                key=tag['key'],
                 text=tag['content'],
                 background=QColor(tag['background']),
                 foreground=QColor(tag['foreground'])

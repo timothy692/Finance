@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import *
 from pages.dashboard import DashboardPage
 from pages.transactions import TransactionsPage
 from widgets.components.separator import Separator
-from widgets.util.style_util import load_stylesheet
+from widgets.util.styleUtil import load_stylesheet
 
 
 class App(QMainWindow):

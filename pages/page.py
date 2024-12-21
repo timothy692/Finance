@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 
 from models.tag import TagManager
 from widgets.components.separator import Separator
-from widgets.util.style_util import load_stylesheet
+from widgets.util.styleUtil import load_stylesheet
 
 
 class Page(QFrame):

@@ -5,8 +5,8 @@ from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (QFrame, QGraphicsDropShadowEffect, QLabel,
                              QLayout, QLineEdit, QVBoxLayout)
 
-from widgets.util.drop_shadow import DropShadowEffect
-from widgets.util.style_util import load_stylesheet
+from widgets.util.dropshadow import DropShadowEffect
+from widgets.util.styleUtil import load_stylesheet
 
 
 class Input(QVBoxLayout):
