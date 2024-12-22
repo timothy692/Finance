@@ -34,6 +34,9 @@ class FramelessDialog(QDialog):
     def total_width(self) -> int:
         return self.width() - self._padding*2
     
+    def spacing(self, spacing: int) -> None:
+        self.container.setSpacing(spacing)
+    
     def create_widget_label(self, text: str) -> QLabel:
         label = QLabel(text)
         label.setObjectName('widget-label')

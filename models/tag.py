@@ -9,7 +9,7 @@ from db import database
 
 @dataclass
 class Tag:
-    key: str,
+    key: str
     text: str
     background: QColor
     foreground: QColor
@@ -42,9 +42,20 @@ class TagManager:
 
         return list(self._tags.values())
     
-    def get_tag(self, key: str) -> None:
+    def get_tag(self, key: str) -> Tag:
         """
         Gets a tag with the specified key, if none can be found None is returned
         """
 
         return self._tags.get(key)
+    
+    def get_key_for(self, text: str) -> str|None:
+        """
+        Returns the tag key that has the corresponding text, if found
+        """
+
+        for k,v in self._tags.items():
+            if v.text == text:
+                return v
+            
+        return None

@@ -15,8 +15,8 @@ def initLogger():
 
 os.environ["QT_QPA_PLATFORM"]           = "wayland" 
 os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
-os.environ["QT_SCALE_FACTOR"]           = "0.7" 
-# os.environ["QT_FONT_DPI"]               = "96"
+os.environ["QT_SCALE_FACTOR"]           = "1" 
+# os.environ["QT_FONT_DPI"]               = "80"
 
 
 if __name__ == '__main__':

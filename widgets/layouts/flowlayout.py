@@ -19,6 +19,9 @@ class FlowLayout(QLayout):
     def count(self):
         """Return the number of items in the layout."""
         return len(self._items)
+    
+    def all(self):
+        return self._items
 
     def itemAt(self, index):
         """Return the item at a specific index."""

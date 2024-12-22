@@ -1,7 +1,7 @@
 from typing import Dict, List
 from functools import partial
 
-from PyQt6.QtGui import QIcon, QColor, QPixmap, QPainter, QValidator,  QDoubleValidator
+from PyQt6.QtGui import QIcon, QColor, QPixmap, QPainter, QValidator, QDoubleValidator
 from PyQt6.QtCore import Qt as qt
 from PyQt6.QtCore import QSize, QPoint
 from PyQt6.QtWidgets import *
@@ -18,137 +18,60 @@ from .dialog import FramelessDialog
 
 class TransactionDialog(FramelessDialog):
     def __init__(self, parent: QWidget):
-        self._last_selector_idx = -1 # Selector index for add item in flow layout
-        self._added_tags: Dict[str, int] = dict()
-
-        self._tag_menu = QMenu()
-        self._tag_menu.setFixedWidth(300)
-
-        self._tag_menu.setStyleSheet(
-            '''
-            QMenu {
-                background-color: white;
-                border: 1px solid #c6c6c6;
-                border-radius: 16px;
-                padding: 8px;
-            }
-
-            QMenu::item {
-                color: black;
-                background-color: transparent;
-                font-family: 'Inter Regular';
-                font-size: 21px;
-                padding-left: 20px;
-                height: 40px;
-                border-radius: 8px;
-            }
-
-            QMenu::item:selected {
-                background-color: #f8f8fa; 
-                border: none;
-                border-radius: 8px;
-            }
-            '''
-        )
-        self._tags = TagManager().all()
+        self._selector_menu = QMenu()
+        self._tags: List[str] = []
 
         super().__init__(parent, 'Add Transaction', 600, 750)
 
     def init(self):
-        self.container.setSpacing(25)
+        self.spacing(25)
 
-        description_input = Input('Description', self.total_width(), effect=DropShadowEffect()) \
-                            .add_input_label('Description').build()
+        self.container.addLayout(self._init_description_input().build())
+        self.container.addLayout(self._init_amount_input().build())
+        self.container.addLayout(self._init_tag_layout())
 
-        self.container.addLayout(description_input)
+        self.reposition_selector()
 
-        amount_input = Input('Amount', self.total_width(), effect=DropShadowEffect()) \
-                            .add_input_label('Amount')
-        
-        self.container.addLayout(amount_input.build())
-
-        self._amount_tb = amount_input.get_textbox()
-        self._amount_tb.textChanged.connect(self._on_text_changed)
-        self._amount_tb.cursorPositionChanged.connect(self._on_cursor_position_changed)
-
-        # Layout for tags (label, flow layout)
-
-        tag_layout = QVBoxLayout()
-        tag_layout.setSpacing(0)
-
-        tag_label = QLabel('Select tags')
-        tag_label.setStyleSheet(
-            load_stylesheet('styles/components/input.qss') + # Re-use qlabel style from input component
-
-            '''
-            QLabel 
-            { 
-                padding-bottom: 7px; 
-            }
-            '''
-        )
-        
-        flow_container = QFrame() # Frame for the flow layout to customize border
-        flow_container.setObjectName('container')
-        flow_container.setFixedWidth(self.total_width()-8)
-        flow_container.setStyleSheet(
-            '''
-            QFrame#container {
-                border: 1px solid #CCCCCC;
-                border-radius: 8px;
-                padding: 10px;   
-            }   
-            '''
-        )
-        self.flow_layout = FlowLayout() 
-        flow_container.setLayout(self.flow_layout) # Flow container's layout is set to flow layout
-
-        self.move_selector()
-
-        tag_layout.addWidget(tag_label)
-        tag_layout.addWidget(flow_container)
-
-        self.container.addLayout(tag_layout)
         self.container.addStretch()
 
     def add_tag(self, tag: Tag) -> None:
-        tag_frame = self._create_tag_frame(tag.text, tag.foreground)
-        btn = tag_frame.findChild(QPushButton)
+        self.flow_layout.parentWidget().setUpdatesEnabled(False)
 
-        idx = self.flow_layout.count()  # Current count before adding the tag
-        self._added_tags[btn.objectName()] = idx
-        btn.clicked.connect(partial(self._handle_tag_click, idx))
+        frame = self._create_tag_frame(tag) 
+        frame.setObjectName(tag.key)
+        delete_btn = frame.findChild(QPushButton)
 
-        self.flow_layout.addWidget(tag_frame)
+        # Call remove_tag on button click 
+        delete_btn.clicked.connect(partial(self.remove_tag, tag.key))
 
-        print(f'Added tag, moving selector to idx {idx + 1}')
-        self.move_selector()
+        self.flow_layout.addWidget(frame)
+        self.reposition_selector()
 
+        self.flow_layout.parentWidget().setUpdatesEnabled(True)
 
-        print('added tag, moved selector from idx',self._last_selector_idx,'to',idx+1)
-        self.move_selector(self._last_selector_idx, idx+1) 
+    def remove_tag(self, key: str) -> None:
+        for idx,item in enumerate(self.flow_layout.all()):
+            if item.widget().objectName() == key:
+                self.flow_layout.takeAt(idx)
 
-    def move_selector(self) -> None:
-        # Remove the existing selector if it exists
-        if self._last_selector_idx != -1:
-            item = self.flow_layout.takeAt(self._last_selector_idx)
-            if item and item.widget():
-                item.widget().setParent(None)
+    def reposition_selector(self) -> None:
+        # Delete any previous selectors
+        for idx,item in enumerate(self.flow_layout.all()):
+            if item.widget().objectName() == 'selector':
+                self.flow_layout.takeAt(idx)
+                print('removed selector at',idx)
 
-        # Add the selector at the end
-        selector = self._create_selector_frame()
-        self.flow_layout.addWidget(selector)
+        frame = self._create_selector_frame()
+        frame.setObjectName('selector')
 
-        btn = selector.findChild(QPushButton)
-        btn.co
+        selector_btn = frame.findChild(QPushButton)
+        selector_btn.clicked.connect(self._show_selector_menu)
 
-        # Update the selector index to the last position
-        self._last_selector_idx = self.flow_layout.count() - 1
-        print(f'Moved selector to idx {self._last_selector_idx}')
-                
-    def _selector_menu(self) -> None:
-        if len(self._tag_menu.actions()) > 0:
-            self._tag_menu.clear()
+        self.flow_layout.addWidget(frame)
+
+    def _show_selector_menu(self) -> None:
+        if len(self._selector_menu.actions()) > 0:
+            self._selector_menu.clear()
 
         def icon_pixmap(color: str, size: int, padding: int) -> QPixmap:
             """
@@ -168,51 +91,24 @@ class TransactionDialog(FramelessDialog):
 
             return pixmap
         
-        for item in self._tags:
-            action = self._tag_menu.addAction(item.text)
+        tag_manager = TagManager()
+        
+        for item in tag_manager.all():
+            action = self._selector_menu.addAction(item.text)
             action.setIcon(QIcon(icon_pixmap(item.foreground, 18, padding=15)))
 
-            action.triggered.connect(lambda checked, t=item.text: self._handle_menu_click(t))
+            # action.triggered.connect(lambda checked, t=item.text: self._handle_menu_click(t))
+            action.triggered.connect(lambda checked, i=item: self.add_tag(i))
 
         btn = self.sender()
         pos = btn.mapToGlobal(QPoint(0, btn.height()))
-        self._tag_menu.exec(pos)
-    
-    def _handle_menu_click(self, text: str) -> None:
-        for item in self._tags:
-            if item.text == text:
-                # Remove the tag from the tag list to prevent duplicate tags
-                self._tags.remove(item)   
-
-                # Add the tag to the flow layout
-                self.add_tag(item)
-
-    def _handle_tag_click(self, index: int) -> None:
-        # Remove the tag widget at the given index
-        item = self.flow_layout.takeAt(index)
-        if item and item.widget():
-            item.widget().setParent(None)
-
-        # Update `_added_tags` to reflect the removal
-        tag_to_remove = None
-        for tag, idx in self._added_tags.items():
-            if idx == index:
-                tag_to_remove = tag
-                break
-
-        if tag_to_remove:
-            del self._added_tags[tag_to_remove]
-
-        # Shift the indices of remaining tags
-        for tag, idx in self._added_tags.items():
-            if idx > index:
-                self._added_tags[tag] = idx - 1
-
-        # Reposition the selector
-        print(f'Removed tag at idx {index}, repositioning selector')
-        self.move_selector()
+        self._selector_menu.exec(pos)
 
     def _create_selector_frame(self) -> QFrame:
+        """
+        Creates a selector frame with a child button
+        """
+
         container = QFrame()
         container.setFixedHeight(25)
         container.setContentsMargins(0,3,0,0)
@@ -240,7 +136,7 @@ class TransactionDialog(FramelessDialog):
 
     def _create_tag_frame(self, tag: Tag) -> QFrame:
         """
-        Creates a tag frame to be added to the flow layout
+        Creates a tag frame with a child button
         """
 
         container = QFrame()
@@ -304,6 +200,58 @@ class TransactionDialog(FramelessDialog):
 
         container.setLayout(layout)
         return container
+
+    def _init_description_input(self) -> Input:
+        return Input('Description', self.total_width(), effect=DropShadowEffect()) \
+                            .add_input_label('Description')
+    
+    def _init_amount_input(self) -> Input:
+        amount_input = Input('Amount', self.total_width(), effect=DropShadowEffect()) \
+                            .add_input_label('Amount')
+        
+        self._amount_tb = amount_input.get_textbox()
+        self._amount_tb.textChanged.connect(self._on_text_changed)
+        self._amount_tb.cursorPositionChanged.connect(self._on_cursor_position_changed)
+
+        return amount_input
+
+    def _init_tag_layout(self) -> QVBoxLayout:
+        tag_layout = QVBoxLayout()
+        tag_layout.setSpacing(0)
+
+        tag_label = QLabel('Select tags')
+        tag_label.setStyleSheet(
+            load_stylesheet('styles/components/input.qss') + # Re-use qlabel style from input component
+
+            '''
+            QLabel 
+            { 
+                padding-bottom: 7px; 
+            }
+            '''
+        )
+        
+        flow_container = QFrame() # Frame for the flow layout to customize border
+        flow_container.setObjectName('container')
+        flow_container.setFixedWidth(self.total_width()-8)
+        flow_container.setStyleSheet(
+            '''
+            QFrame#container {
+                border: 1px solid #CCCCCC;
+                border-radius: 8px;
+                padding: 10px;   
+            }   
+            '''
+        )
+
+        flow_layout = FlowLayout() 
+        flow_container.setLayout(flow_layout) # Flow container's layout is set to flow layout
+
+        tag_layout.addWidget(tag_label)
+        tag_layout.addWidget(flow_container)
+
+        self.flow_layout = flow_layout
+        return tag_layout
 
     def _on_cursor_position_changed(self, _, new) -> None:
         if new < 2:

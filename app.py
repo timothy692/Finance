@@ -14,7 +14,7 @@ from widgets.util.styleUtil import load_stylesheet
 
 
 class App(QMainWindow):
-    def __init__(self, title: str, width=1600, height=1100) -> None:        
+    def __init__(self, title: str, width=1400, height=800) -> None:        
         # Ensure qt is not initialized more than once
         if not QApplication.instance():
             self.app = QApplication(sys.argv)
@@ -45,6 +45,20 @@ class App(QMainWindow):
 
         self._init_sidebar()
         self._init_container()
+
+    #     for w in self.app.allWidgets():
+    #         self.scale_widget(w, 0.99)
+
+    # def scale_widget(self, widget, scale_factor):
+    #     widget.setFixedSize(
+    #         int(widget.width() * scale_factor),
+    #         int(widget.height() * scale_factor)
+    #     )
+
+    #     # font = widget.font()
+    #     # font.setPointSize(int(font.pointSize() * scale_factor))
+    #     # widget.setFont(font)
+
 
     def _on_sidebar_button_clicked(self, idx: int) -> None:
         # Reset all buttons
