@@ -3,7 +3,7 @@ QTreeView {                         /* Rows and content */
     font-family: 'Inter Regular';
     color: black;
     border: none;
-    font-size: 25px;
+    font-size: 16px;
     margin: 0px;
     padding: 0px;
 }
@@ -14,18 +14,17 @@ QTreeView::item {                   /* Row */
 }
 
 QHeaderView {                       /* Header */
+    background-color: #f8f8fa;
     border: 1px solid #E0E0E0;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 QHeaderView::section {              /* Header */
     background-color: #f8f8fa;
     color: #545454;
     font-family: 'Inter Regular';
-    font-size: 25px; 
-    border: none;                   /* TODO: fix border edge bug */
-    /* border: 1px solid #f8f8fa;
-    border-radius: 5px; */
+    font-size: 16px; 
+    border-radius: 8px; 
     padding-left: 60px;
     margin: 0px;
 }

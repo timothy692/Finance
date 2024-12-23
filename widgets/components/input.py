@@ -18,7 +18,7 @@ class Input(QVBoxLayout):
         tb = QLineEdit()
         tb.setReadOnly(False)
         tb.setPlaceholderText(placeholder)
-        tb.setFixedSize(width, 56)
+        tb.setFixedSize(width, 40)
 
         tb.setStyleSheet(
             load_stylesheet('styles/components/input.qss')

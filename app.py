@@ -46,20 +46,6 @@ class App(QMainWindow):
         self._init_sidebar()
         self._init_container()
 
-    #     for w in self.app.allWidgets():
-    #         self.scale_widget(w, 0.99)
-
-    # def scale_widget(self, widget, scale_factor):
-    #     widget.setFixedSize(
-    #         int(widget.width() * scale_factor),
-    #         int(widget.height() * scale_factor)
-    #     )
-
-    #     # font = widget.font()
-    #     # font.setPointSize(int(font.pointSize() * scale_factor))
-    #     # widget.setFont(font)
-
-
     def _on_sidebar_button_clicked(self, idx: int) -> None:
         # Reset all buttons
         for btn in self.buttons:
@@ -80,19 +66,19 @@ class App(QMainWindow):
     def _init_sidebar(self):
         frame = QFrame()
         frame.setObjectName('sidebar')
-        frame.setFixedWidth(470)
+        frame.setFixedWidth(270)
         sidebar = QVBoxLayout(frame)
         sidebar.setContentsMargins(0,0,0,0) # Ensure separator does not have a margin
 
-        sidebar.addSpacing(100) # Spacing from the top
+        sidebar.addSpacing(62) # Spacing from the top
         
         frame.setStyleSheet(
             load_stylesheet('styles/sidebar.qss')
         )
 
-        sidebar.addWidget(Separator(color=QColor(200, 200, 200), height=1))
+        sidebar.addWidget(Separator())
 
-        sidebar.addSpacing(80) # Spacing below the separator
+        sidebar.addSpacing(40) # Spacing below the separator
 
         idx = 0
         def create_button(name: str, icon: str, size: int) -> QPushButton:
@@ -102,7 +88,7 @@ class App(QMainWindow):
             btn.setIcon(QIcon(icon))
             btn.setIconSize(QSize(size, size))
             btn.setLayoutDirection(qt.LayoutDirection.LeftToRight)
-            btn.setFixedHeight(90)
+            btn.setFixedHeight(55)
             btn.setCursor(qt.CursorShape.PointingHandCursor)
 
             self.buttons.append(btn)
@@ -111,21 +97,23 @@ class App(QMainWindow):
             idx += 1
 
             return btn
+        
+        icon_size = 26
             
         sidebar.addWidget(
-            create_button('Dashboard', 'assets/icons/dashboard.png', 48)
+            create_button('Dashboard', 'assets/icons/dashboard.png', icon_size)
         )
         sidebar.addWidget(
-            create_button('Transactions', 'assets/icons/transactions.png', 48)
+            create_button('Transactions', 'assets/icons/transactions.png', icon_size)
         )
         sidebar.addWidget(
-            create_button('Budgets', 'assets/icons/budgets.png', 48)
+            create_button('Budgets', 'assets/icons/budgets.png', icon_size)
         )
         sidebar.addWidget(
-            create_button('Insights', 'assets/icons/insights.png', 48)
+            create_button('Insights', 'assets/icons/insights.png', icon_size)
         )
         sidebar.addWidget(
-            create_button('Investments', 'assets/icons/investments.png', 48)
+            create_button('Investments', 'assets/icons/investments.png', icon_size)
         )
 
         sidebar.addStretch() # Push the buttons to the top

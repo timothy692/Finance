@@ -21,31 +21,33 @@ class TransactionsPage(Page):
         dialog = TransactionDialog(self)
         dialog.center()
 
-        dialog.exec()
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            data = dialog.get_data()
+            print(data)
 
     def _init_top_container(self) -> None:
         def create_button(label: str, object_name: str, width: int, icon: str=None) -> QPushButton:
             btn = QPushButton(label)
             btn.setObjectName(object_name)
-            btn.setFixedSize(width, 48)
+            btn.setFixedSize(width, 32)
             btn.setCursor(qt.CursorShape.PointingHandCursor)
 
             if icon:
                 btn.setIcon(QIcon(icon))
-                btn.setIconSize(QSize(30,30))
+                btn.setIconSize(QSize(19,19))
 
             return btn
         
         transactions_btn = create_button(
-            'Add transaction', 'transaction', 235
+            'Add transaction', 'transaction', 155
         )
 
         export_btn = create_button(
-            '  Export CSV', 'export', 210, 'assets/icons/export.png'
+            '  Export CSV', 'export', 146, 'assets/icons/export.png'
         )
 
         import_btn = create_button(
-            '  Import CSV', 'import', 210, 'assets/icons/import.png'
+            '  Import CSV', 'import', 146, 'assets/icons/import.png'
         )
 
         self.layout_top.addWidget(import_btn, alignment=qt.AlignmentFlag.AlignLeft)
@@ -60,7 +62,7 @@ class TransactionsPage(Page):
         panel_container = QWidget()
         panel_layout = QHBoxLayout(panel_container)
         panel_layout.setContentsMargins(0,0,0,0)
-        panel_layout.setSpacing(25)
+        panel_layout.setSpacing(15)
 
         panel_layout.addWidget(
             PanelWidget('Total income', 10000), stretch=1

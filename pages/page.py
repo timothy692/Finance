@@ -2,8 +2,8 @@ from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import *
 
 from models.tag import TagManager
-from widgets.components.separator import Separator
 from widgets.util.styleUtil import load_stylesheet
+from widgets.components.separator import Separator
 
 
 class Page(QFrame):
@@ -24,18 +24,18 @@ class Page(QFrame):
         self.layout_top.setContentsMargins(15,15,15,15)
         self.layout_top.setSpacing(0)
         frame = QFrame()
-        frame.setFixedHeight(70)
+        frame.setFixedHeight(30)
         frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.layout_top.addWidget(frame)
 
         # Bottom layout
 
         self.layout_bottom = QVBoxLayout()
-        self.layout_bottom.setContentsMargins(25,25,25,25)
+        self.layout_bottom.setContentsMargins(20,20,20,20)
         self.layout_bottom.setSpacing(30)
 
         layout.addLayout(self.layout_top)
-        layout.addWidget(Separator(color=(QColor(200,200,200)), height=1))
+        layout.addWidget(Separator())
         layout.addLayout(self.layout_bottom, stretch=2)
 
         self._init_top_container()

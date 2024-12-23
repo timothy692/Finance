@@ -18,7 +18,7 @@ class PanelWidget(QFrame):
                 border: 2px solid #7D7BFF;
                 border-radius: 10px;
                 background-color: #F8F8FF;
-                padding: 15px;
+                padding: 8px;
             }
                            
             QLabel {
@@ -26,22 +26,23 @@ class PanelWidget(QFrame):
             }
         """)
 
-        self.setMinimumWidth(560)
+        self.setMinimumWidth(380)
+        self.setFixedHeight(130)
 
         main_layout = QHBoxLayout()
-        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(5)
 
         label_layout = QVBoxLayout()
 
         title_label = QLabel(title)
-        title_label.setFont(QFont('Inter Regular', 20))
+        title_label.setFont(QFont('Inter Regular', 14))
         title_label.setStyleSheet(
             'color: #545454;'
         )
         
         value_label = QLabel('${:,.2f}'.format(value))
-        value_label.setFont(QFont('Inter Regular', 28))
+        value_label.setFont(QFont('Inter Regular', 19))
         value_label.setStyleSheet(
             'color: black;'
         )
@@ -51,13 +52,13 @@ class PanelWidget(QFrame):
         indicator_layout.setSpacing(10) 
 
         icon_label = QLabel()
-        icon_pixmap = QPixmap('assets/icons/uptrend.png').scaled(32, 32, 
+        icon_pixmap = QPixmap('assets/icons/uptrend.png').scaled(22, 22, 
                                                            qt.AspectRatioMode.KeepAspectRatio, 
                                                            qt.TransformationMode.SmoothTransformation)
         icon_label.setPixmap(icon_pixmap)
 
         indicator = QLabel('0% vs last month')
-        indicator.setFont(QFont('Inter Regular', 19))
+        indicator.setFont(QFont('Inter Regular', 12))
         indicator.setStyleSheet('color: #545454;')
 
         indicator_layout.addWidget(icon_label)
@@ -74,7 +75,7 @@ class PanelWidget(QFrame):
         main_layout.addLayout(label_layout)
 
         grid_frame = self._grid_frame()
-        grid_frame.setFixedSize(150, 150)
+        grid_frame.setFixedSize(100, 100)
         main_layout.addWidget(grid_frame, alignment=qt.AlignmentFlag.AlignRight)
 
         self.setLayout(main_layout)

@@ -127,13 +127,13 @@ class TransactionTreeview(QTreeView):
         header = self.header()
         header.setSectionsMovable(False)
         header.setStretchLastSection(True)
-        header.setFixedHeight(65)
+        header.setFixedHeight(40)
 
-        header.resizeSection(0, 230) # Date
-        header.resizeSection(1, 430) # Transaction
-        header.resizeSection(2, 200) # Amount
-        header.resizeSection(3, 355) # Tag
-        header.resizeSection(4, 200) # Account
+        header.resizeSection(0, 140) # Date - Transaction
+        header.resizeSection(1, 250) # Transaction - Amount
+        header.resizeSection(2, 160) # Amount - Tag
+        header.resizeSection(3, 200) # Tag - Account
+        header.resizeSection(4, 80) # Account 
 
         self.setRootIsDecorated(False)
         self.setSelectionMode(QTreeView.SelectionMode.NoSelection) 
