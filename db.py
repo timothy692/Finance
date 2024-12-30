@@ -1,14 +1,21 @@
 import logging
 import sqlite3 as sql
+from typing import Dict, List, Type, TypeVar, TypedDict
 from datetime import datetime
-from typing import Dict, List
 
+from repositories.tagRepo import TagRepository
+from repositories.repository import Repository
+from repositories.transactionRepo import TransactionRepository
+
+T = TypeVar('T',  bound='Repository')
 
 class Database:
     def __init__(self, db_name='database.db'):
         self.logger = logging.getLogger(self.__class__.__name__)
         self._conn = None
         self._db_name = db_name
+
+        self._repos = {}
 
         self.try_connect(db_name)
         self._init_tables()
@@ -26,7 +33,7 @@ class Database:
         self._conn.close()
         self.logger.info(f'Disconnected from database (\'{self._db_name}\')')
 
-    def connection(self) -> None:
+    def connection(self) -> sql.Connection:
         return self._conn
     
     def is_connected(self) -> bool:
@@ -87,96 +94,16 @@ class Database:
             
             self.logger.info('Initialized tables')
         
-    def add_transaction(self, date: str, description: str, amount: float, balance: float, categories: List[str]|str, account: str) -> None:
+    def get_repository(self, repository: Type[T]) -> T:
         """
-        Adds a single transaction into the database
-        """
-        
-        with self._conn:
-            cursor = self._conn.cursor()
-            category = ' '.join(categories) if isinstance(categories, list) else categories
-
-            cursor.execute('''
-                INSERT INTO transactions (date,description,amount,balance,category,account) 
-                           VALUES (?,?,?,?,?,?);
-            ''', (date,description,amount,balance,category,account))
-            
-            self.logger.info(f'Inserted transaction id #{cursor.lastrowid}')
-
-    def add_transactions(self, transactions: List[Dict[str, any]]) -> None:
-        """
-        Adds transactions in bulk into the database
-
-        Args:
-            A list of transaction dicts (date,description,amount,balance,category,account)
+        Returns an instance of the repository\n
+        If an instance has not yet been created, it is added to the cache
         """
 
-        with self._conn:
-            cursor = self._conn.cursor()
-            
-            # Prepare the data to be inserted into the database
-            data = [
-                (
-                    transaction['date'],
-                    transaction['description'],
-                    transaction['amount'],
-                    transaction['balance'],
-                    transaction['category'],
-                    transaction['account']
-                )
+        if repository not in self._repos:
+            self._repos[repository] = repository(self)
 
-                for transaction in transactions
-            ]
-
-            cursor.executemany('''
-                INSERT INTO transactions (date,description,amount,balance,category,account) 
-                           VALUES (?,?,?,?,?,?);
-                ''', data)
-            
-            self.logger.info(f'Inserted {cursor.rowcount} transactions')
-
-    def get_tags(self, key: str=None) -> List[Dict[str,any]]|Dict[str,any]|None:
-        '''
-        Retrieves all tags from the database if key not specified
-
-        Args:
-            key: The key of the tag
-
-        Returns:
-            A list of dict or single dict containing each tag data (content,background,foreground)
-        '''
-
-        with self._conn:
-            cursor = self._conn.cursor()
-            if key:
-                cursor.execute('SELECT key,content,background,foreground FROM tags WHERE key = ?', (key,))
-                row = cursor.fetchone()
-
-                if not row:
-                    return None
-                else:
-                    return {
-                        'key': row[0],
-                        'content': row[1],
-                        'background': row[2],
-                        'foreground': row[3]
-                    }
-            
-            # Retrieve all tags
-
-            cursor.execute('SELECT key,content,background,foreground FROM tags')
-            rows = cursor.fetchall()
-
-            return [
-                {
-                    'key':row[0],
-                    'content': row[1], 
-                    'background': row[2], 
-                    'foreground': row[3]
-                }
-                for row in rows
-            ]
-        
+        return self._repos[repository]
 
 # Initialize a global instance of database
 database = Database('database.db')

@@ -1,7 +1,6 @@
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import *
 
-from models.tag import TagManager
 from widgets.util.styleUtil import load_stylesheet
 from widgets.components.separator import Separator
 

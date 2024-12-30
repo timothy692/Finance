@@ -9,7 +9,7 @@ QTreeView {                         /* Rows and content */
 }
 
 QTreeView::item {                   /* Row */
-    height: 100px;
+    height: 55px;
     /* color: black; */
 }
 

@@ -74,6 +74,7 @@ class FramelessDialog(QDialog):
         self.container = QVBoxLayout()
         self.container.setContentsMargins(self._margins)
         self.container.setSpacing(0)
+        self.container.addStretch()
 
         layout.addLayout(self.container, stretch=1)
 
@@ -112,14 +113,30 @@ class FramelessDialog(QDialog):
     def add_data(self, key: str, data: any) -> None:
         self._data[key] = data
 
-    def _collect_data(self) -> None:
+    def _collect_data(self):
         for k,w in self._registered_widgets.items():
             value = None
 
             if isinstance(w, QLineEdit):
                 value = w.text()
 
+            if not value or len(value) < 1:
+                missing_data = True
+
             self._data[k] = value
+
+    def validate_data(self) -> bool:
+        """
+        If any data is missing, False is returned
+        """
+
+        valid = True
+
+        for value in self._data.values():
+            if not value or len(value) == 0:
+                valid = False
+
+        return valid
             
     def get_data(self) -> Dict[str, any]:
         return self._data
@@ -144,7 +161,9 @@ class FramelessDialog(QDialog):
         """
 
         self._collect_data()
-        self.accept()
+
+        if self.validate_data():
+            self.accept()
 
     def container_width(self) -> int:
         return (self.width() - self._margins.left()) - self._margins.right()

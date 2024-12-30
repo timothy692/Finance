@@ -1,37 +1,33 @@
 from typing import List
 from functools import partial
 
-from PyQt6.QtGui import (
-    QIcon,
-    QColor,
-    QPixmap,
-    QPainter,
-    QValidator,
-    QFontMetrics,
-    QDoubleValidator,
-)
+from PyQt6.QtGui import QIcon, QColor, QPixmap, QPainter, QFontMetrics
 from PyQt6.QtCore import Qt as qt
 from PyQt6.QtCore import QRect, QSize, QPoint, QMargins
 from PyQt6.QtWidgets import *
 
-from models.tag import Tag, TagManager
+from db import database
+from repositories.tagRepo import TagRepository
+from models.tag import Tag
+from util.doubleValidator import DoubleValidator
 from widgets.util.styleUtil import load_stylesheet
 from widgets.util.dropshadow import DropShadowEffect
 from widgets.components.input import Input
+from widgets.components.combobox import ComboBox
 from widgets.layouts.flowlayout import FlowLayout
 
 from .dialog import FramelessDialog
 
 
 class TransactionDialog(FramelessDialog):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent):
         self._selector_menu = QMenu()
         self._selector_menu.setStyleSheet(
             '''
             QMenu {
                 background-color: white;
                 border: 1px solid #c6c6c6;
-                border-radius: 16px;
+                border-radius: 10px;
                 padding: 5px;
             }
 
@@ -53,10 +49,12 @@ class TransactionDialog(FramelessDialog):
             '''
         )
 
-        self.max_tags = 5
+        self.max_tags = 4
 
-        self._tag_manager = TagManager()
+        self._tags = database.get_repository(TagRepository).fetch_tags()
         self._added_tags: List[Tag] = []
+
+        self.currency = '$'
 
         super().__init__(parent, 'Add Transaction', 425, 556)
 
@@ -65,7 +63,7 @@ class TransactionDialog(FramelessDialog):
         self.set_container_margins(QMargins(30,20,30,15))
 
         self.container.addLayout(self._init_description_input().build())
-        self.container.addLayout(self._init_amount_input().build())
+        self.container.addLayout(self._init_amount_layout())
         self.container.addLayout(self._init_account_input().build())
         self.container.addLayout(self._init_tag_layout(), stretch=1)
 
@@ -74,7 +72,9 @@ class TransactionDialog(FramelessDialog):
         self.container.addStretch()
     
     def on_save(self):
-        self.add_data('tags', [tag.key for tag in self._added_tags])
+        self.add_data('tags', [tag for tag in self._added_tags])
+        self.add_data('amount', 
+                      self.amount.get_textbox().text().replace(self.currency, '').strip())
 
         return super().on_save()
 
@@ -148,7 +148,7 @@ class TransactionDialog(FramelessDialog):
         longest_width = 0
             
         # Filter out tags that have already been added
-        for tag in [item for item in self._tag_manager.all() if item.key not in {tag.key for tag in self._added_tags}]:
+        for tag in [item for item in self._tags if item.key not in {tag.key for tag in self._added_tags}]:
             action = self._selector_menu.addAction(tag.text)
             action.setIcon(QIcon(icon_pixmap(tag.foreground, 18, padding=15)))
 
@@ -272,18 +272,65 @@ class TransactionDialog(FramelessDialog):
 
         return inp
     
-    def _init_amount_input(self) -> Input:
-        inp = Input('Amount', self.container_width(), effect=DropShadowEffect()) \
-                            .add_input_label('Amount')
+    def _init_amount_layout(self) -> QVBoxLayout:
+        height = 40
+        type_width = 103
+        total_width = self.container_width()-type_width
+
+        hlayout = QHBoxLayout()
+        hlayout.setSpacing(0)
         
-        self._amount_tb = inp.get_textbox()
-        self._amount_tb.textChanged.connect(self._on_text_changed)
-        self._amount_tb.cursorPositionChanged.connect(self._on_cursor_position_changed)
+        _type = ComboBox(width=type_width, height=height, border_radius=0, effect=DropShadowEffect())
+        self.amount = Input(placeholder='Amount', width=total_width, height=height, border_radius=0, effect=DropShadowEffect())
+        textbox = self.amount.get_textbox()
 
-        self.register_data_widget('amount', inp.get_textbox())
+        _type.activated.connect(lambda: textbox.setFocus())
 
-        return inp
-    
+        _type.addItems(['Expense', 'Income'])
+        _type.setStyleSheet(
+            _type.styleSheet() +
+            '''
+            QComboBox {
+                border-top-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+                border-right: none;
+                background-color: #f8f8fa;
+            }
+
+            QComboBox::down-arrow, QComboBox::down-arrow:on , QComboBox::drop-down {
+                background-color: #f8f8fa;
+            }
+            '''
+        )
+        
+        textbox.setStyleSheet(
+            textbox.styleSheet() +
+            '''
+            QLineEdit {
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+            '''
+        )
+
+        self.validator = DoubleValidator(self.currency)
+        self.validator.attach(textbox)
+
+        hlayout.addWidget(_type)
+        hlayout.addLayout(self.amount.build())
+
+        vlayout = QVBoxLayout()
+        vlayout.setSpacing(7)
+        label = QLabel('Type and amount')
+        label.setStyleSheet(
+            load_stylesheet('styles/components/input.qss')
+        )
+
+        vlayout.addWidget(label, alignment=qt.AlignmentFlag.AlignTop | qt.AlignmentFlag.AlignLeft)
+        vlayout.addLayout(hlayout)
+
+        return vlayout
+
     def _init_account_input(self) -> Input:
         inp = Input('Account', self.container_width(), effect=DropShadowEffect()) \
                             .add_input_label('Account')
@@ -323,7 +370,7 @@ class TransactionDialog(FramelessDialog):
             '''
         )
 
-        flow_layout = FlowLayout() 
+        flow_layout = FlowLayout(hspacing=5, vspacing=5) 
         flow_layout.setGeometry(QRect())
         flow_container.setLayout(flow_layout) # Flow container's layout is set to flow layout
 
@@ -332,54 +379,3 @@ class TransactionDialog(FramelessDialog):
 
         self.flow_layout = flow_layout
         return tag_layout
-
-    def _on_text_changed(self, text: str) -> None:
-        """
-        Amount validator logic
-        """
-
-        tb = self._amount_tb
-
-        tb.textChanged.disconnect(self._on_text_changed)
-
-        if text.startswith('$'):
-            text = text[1:].strip()
-
-        if 'e' in text:
-            text = text.replace('e', '')
-        
-        if ',' in text:
-            text = text.replace(',', '')
-
-        bottom = 0.01
-        top = 999999.99
-
-        validator = QDoubleValidator(bottom, top, 2)
-        state,_,_ = validator.validate(text, 0)
-
-        valid_str = ''
-        if state == QValidator.State.Acceptable:
-            valid_str = text            
-        elif state == QValidator.State.Intermediate and text.startswith('0'):
-            valid_str = text
-        elif state == QValidator.State.Invalid:
-            valid_str = text[:-1]
-
-        if state == QValidator.State.Intermediate or state == QValidator.State.Acceptable:
-            if len(text) == 0:
-                tb.clear()
-
-            try:
-                n = float(text)
-
-                if n >= top:
-                    valid_str = text[:-1]
-                elif text.startswith('0') and len(text) > 1 and not text.startswith('0.'):
-                    valid_str = str(int(n))
-            except ValueError:
-                pass
-        
-        if len(text) > 0:
-            tb.setText(f'$ {valid_str}')
-
-        tb.textChanged.connect(self._on_text_changed)

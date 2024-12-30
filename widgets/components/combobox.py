@@ -28,7 +28,7 @@ class ComboBoxItemDelegate(QStyledItemDelegate):
 
         # Rounded borders
         rect = option.rect.adjusted(1, 1, -1, -1).toRectF()
-        radius = 8
+        radius = 5
 
         path = QPainterPath()
         path.addRoundedRect(rect, radius, radius)
@@ -39,7 +39,7 @@ class ComboBoxItemDelegate(QStyledItemDelegate):
             painter.fillPath(path, QColor("white")) 
 
         # Set font and text color
-        painter.setFont(QFont('Inter Regular', 16))
+        painter.setFont(QFont('Inter Regular', 11))
         painter.setPen(self.text_color)
 
         text_rect = option.rect.adjusted(self.padding, 0, -self.padding, 0) # Add horizontal padding
@@ -57,29 +57,32 @@ class ComboBoxItemDelegate(QStyledItemDelegate):
         return QSize(size.width(), self.height)
     
 class ComboBox(QComboBox):
-    def __init__(self, text: str, width: int, height: int, effect: DropShadowEffect=None):
+    def __init__(self, width: int, height: int, border_radius=10, effect: DropShadowEffect=None):
         super().__init__()    
-        self._text = text
-        self.item_height = 50
+        self.item_height = 32
 
         self.setFixedSize(width, height)
 
         self.setEditable(True)
 
-        self.clearEditText()
-        self.lineEdit().setText(self._text)
         self.lineEdit().setReadOnly(True)
         self.lineEdit().setCursorPosition(0)
         self.lineEdit().setFocusPolicy(qt.FocusPolicy.NoFocus)
 
         self.setItemDelegate(ComboBoxItemDelegate(self.item_height))
+        self.setFocusPolicy(qt.FocusPolicy.StrongFocus)
 
         self.view().setVerticalScrollBarPolicy(qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.view().setAutoScroll(False)
         self.view().setFocusPolicy(qt.FocusPolicy.NoFocus)
 
         self.setStyleSheet(
-            load_stylesheet('styles/components/combobox.qss')
+            load_stylesheet('styles/components/combobox.qss') + 
+            f'''
+            QComboBox {{
+                border-radius: {border_radius};
+            }}
+            '''
         )    
 
         self._effect = effect
@@ -87,19 +90,13 @@ class ComboBox(QComboBox):
             effect.register_events([])
             effect.apply(parent=self)
 
-        self.currentIndexChanged.connect(self._reset_text)
-
-    def _reset_text(self):
-        """Keep the line edit text static."""
-        self.lineEdit().setText(self._text)
-
     def showPopup(self):
         # Apply shadow effect when popup is shown
         if self._effect:
             self._effect.enable()
 
-        list_height = self.count() * self.item_height 
-        self.view().setFixedHeight(list_height)
+        list_height = self.count() * self.item_height
+        self.view().setFixedHeight(list_height + int(self.item_height * .3))
 
         super().showPopup()
 

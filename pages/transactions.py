@@ -1,14 +1,15 @@
-from PyQt6.QtCore import QAbstractTableModel, QSize
+from PyQt6.QtGui import QFont, QIcon, QColor
 from PyQt6.QtCore import Qt as qt
-from PyQt6.QtGui import QColor, QFont, QIcon
+from PyQt6.QtCore import QSize, QAbstractTableModel
 from PyQt6.QtWidgets import *
 
-from models.tag import TagManager
+from data.csv import CSV
 from pages.page import Page
-from widgets.dialogs.addTransaction import TransactionDialog
 from widgets.panel import PanelWidget
-from widgets.transactionTreeview import TransactionTreeview
 from widgets.util.styleUtil import load_stylesheet
+from widgets.dialogs.importCSV import ImportCSV
+from widgets.transactionTreeview import TransactionTreeview
+from widgets.dialogs.addTransaction import TransactionDialog
 
 
 class TransactionsPage(Page):
@@ -23,7 +24,20 @@ class TransactionsPage(Page):
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             data = dialog.get_data()
-            print(data)
+
+            tags = data['tags']
+            
+            self.transactions.add_entry(
+                ['23.10.2024', data['description'], float(data['amount']), tags, data['account']]
+            )
+
+    def show_import_dialog(self) -> None:
+        # dialog = ImportCSV(self)
+        # dialog.center()
+
+        # dialog.exec()
+        data = CSV().import_csv()
+        print(data)
 
     def _init_top_container(self) -> None:
         def create_button(label: str, object_name: str, width: int, icon: str=None) -> QPushButton:
@@ -55,6 +69,7 @@ class TransactionsPage(Page):
         self.layout_top.addWidget(transactions_btn, alignment=qt.AlignmentFlag.AlignLeft)
 
         transactions_btn.clicked.connect(self.show_transaction_dialog)
+        import_btn.clicked.connect(self.show_import_dialog)
 
     def _init_bottom_container(self) -> None:
         # Summary panels
@@ -82,19 +97,19 @@ class TransactionsPage(Page):
 
         # Transaction treeview
 
-        treeview = TransactionTreeview([]) # TODO: add tags
+        self.transactions = TransactionTreeview([]) # TODO: add tags
 
-        treeview.setStyleSheet(
+        self.transactions.setStyleSheet(
             load_stylesheet('styles/treeview.qss')
         )
 
-        # treeview.add_entry(
-        #     ["19.02.2024", "New Transaction", 42, [self.tags.get('entertainment'), self.tags.get('income')], "New Account"],
+        # self.transactions.add_entry(
+        #     ['23.10.2024', 'Description', 19.99, TagManager().get_tag('basic'), 'Credit Card']
         # )
 
-        # treeview.add_entry(
-        #     ["19.10.2024", "New Transaction", -90, [self.tags.get('basic')], "New Account"]
+        # self.transactions.add_entry(
+        #     ['23.10.2024', 'Description', 19.99, [TagManager().get_tag('must-have'), TagManager().get_tag('entertainment')], 'Credit Card']
         # )
 
-        treeview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.layout_bottom.addWidget(treeview)
+        self.transactions.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.layout_bottom.addWidget(self.transactions)

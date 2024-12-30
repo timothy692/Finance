@@ -10,7 +10,7 @@ from widgets.util.styleUtil import load_stylesheet
 
 
 class Input(QVBoxLayout):
-    def __init__(self, placeholder: str, width: int, effect: DropShadowEffect=None) -> None:
+    def __init__(self, placeholder: str, width: int, height=40, border_radius=10, effect: DropShadowEffect=None) -> None:
         super().__init__()
 
         self.layout().setContentsMargins(0,0,0,0)
@@ -18,10 +18,15 @@ class Input(QVBoxLayout):
         tb = QLineEdit()
         tb.setReadOnly(False)
         tb.setPlaceholderText(placeholder)
-        tb.setFixedSize(width, 40)
+        tb.setFixedSize(width, height)
 
         tb.setStyleSheet(
-            load_stylesheet('styles/components/input.qss')
+            load_stylesheet('styles/components/input.qss') +
+            f'''
+            QLineEdit {{
+                border-radius: {border_radius};
+            }}
+            '''
         )
 
         if effect:

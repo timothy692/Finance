@@ -1,8 +1,8 @@
 from typing import List
 
-from PyQt6.QtCore import QAbstractTableModel, QModelIndex, QRectF
+from PyQt6.QtGui import QPen, QFont, QColor, QPainter
 from PyQt6.QtCore import Qt as qt
-from PyQt6.QtGui import QColor, QFont, QPainter, QPen
+from PyQt6.QtCore import QRectF, QModelIndex, QAbstractTableModel
 from PyQt6.QtWidgets import *
 
 from models.tag import Tag
@@ -30,34 +30,34 @@ class TagDelegate(QStyledItemDelegate):
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        font = QFont("Inter Regular", 18)
+        font = QFont("Inter Medium", 10)
         painter.setFont(font)
 
-        padding = 14 # Increase padding for more spacing around the text
-        spacing = 12 # Space between tags
+        padding = 6 # Increase padding for more spacing around the text
+        spacing = 6 # Space between tags
         alignment_offset = 60 # Additional alignment padding to shift tags right
 
         font_metrics = painter.fontMetrics()
         text_height = font_metrics.height()
-        tag_height = text_height + 9 # Height of tag
+        tag_height = text_height + 6 # Height of tag
 
         # Start at the left edge of the "Tag" column
         x_offset = option.rect.x() + alignment_offset
         y_offset = option.rect.y() + (option.rect.height() - tag_height) // 2  # Center vertically
 
         for tag in tags:
-            painter.setBrush(tag.background_color)
-            painter.setPen(QPen(QColor("#D3D3D3"), 1))
+            painter.setBrush(tag.background)
+            painter.setPen(QPen(QColor(211, 211, 211, 100), 1))
 
             # Measure the size of the tag
             tag_width = font_metrics.horizontalAdvance(tag.text) + padding * 2
             tag_rect = QRectF(x_offset, y_offset, tag_width, tag_height)
 
             # Draw the rounded rectangle (background)
-            painter.drawRoundedRect(tag_rect, 12, 12) 
+            painter.drawRoundedRect(tag_rect, 6, 6) 
 
             # Draw the text
-            painter.setPen(tag.text_color)
+            painter.setPen(tag.foreground)
             painter.drawText(tag_rect, qt.AlignmentFlag.AlignCenter, tag.text)
 
             # Update x_offset for the next tag
@@ -129,7 +129,7 @@ class TransactionTreeview(QTreeView):
         header.setStretchLastSection(True)
         header.setFixedHeight(40)
 
-        header.resizeSection(0, 140) # Date - Transaction
+        header.resizeSection(0, 160) # Date - Transaction
         header.resizeSection(1, 250) # Transaction - Amount
         header.resizeSection(2, 160) # Amount - Tag
         header.resizeSection(3, 200) # Tag - Account
@@ -148,7 +148,9 @@ class TransactionTreeview(QTreeView):
         self.setItemDelegateForColumn(3, TagDelegate(self.tags))
 
     def add_entry(self, entry: List[List]):
-        """ Add a row to the treeview """
+        """ 
+        Add a row to the treeview (date, description, amount, tags, account)
+        """
 
         pos = len(self._model.get_data_list())
         self._model.beginInsertRows(QModelIndex(), pos, pos)
