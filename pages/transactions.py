@@ -26,6 +26,7 @@ class TransactionsPage(Page):
             data = dialog.get_data()
 
             tags = data['tags']
+            print(data)
             
             self.transactions.add_entry(
                 ['23.10.2024', data['description'], float(data['amount']), tags, data['account']]

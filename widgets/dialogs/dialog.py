@@ -113,17 +113,20 @@ class FramelessDialog(QDialog):
     def add_data(self, key: str, data: any) -> None:
         self._data[key] = data
 
-    def _collect_data(self):
+    def _collect_data(self) -> dict[str, any]:
+        data = {}
+
         for k,w in self._registered_widgets.items():
             value = None
 
             if isinstance(w, QLineEdit):
                 value = w.text()
+            elif isinstance(w, QComboBox):
+                value = w.currentText()
 
-            if not value or len(value) < 1:
-                missing_data = True
+            data[k] = value
 
-            self._data[k] = value
+        return data
 
     def validate_data(self) -> bool:
         """
@@ -133,7 +136,7 @@ class FramelessDialog(QDialog):
         valid = True
 
         for value in self._data.values():
-            if not value or len(value) == 0:
+            if not value or (isinstance(value, str) and len(value) == 0):
                 valid = False
 
         return valid
@@ -160,7 +163,8 @@ class FramelessDialog(QDialog):
         Called when the save button is pressed
         """
 
-        self._collect_data()
+        for k,v in self._collect_data().items():
+            self._data[k] = v
 
         if self.validate_data():
             self.accept()

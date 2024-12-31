@@ -73,8 +73,11 @@ class TransactionDialog(FramelessDialog):
     
     def on_save(self):
         self.add_data('tags', [tag for tag in self._added_tags])
-        self.add_data('amount', 
-                      self.amount.get_textbox().text().replace(self.currency, '').strip())
+        amount = int(self.amount.get_textbox().text().replace(self.currency, '').strip())
+
+        is_expense = self._collect_data()['transaction-type'].lower() == 'expense'
+
+        self.add_data('amount', -amount if is_expense else amount)
 
         return super().on_save()
 
@@ -283,6 +286,8 @@ class TransactionDialog(FramelessDialog):
         _type = ComboBox(width=type_width, height=height, border_radius=0, effect=DropShadowEffect())
         self.amount = Input(placeholder='Amount', width=total_width, height=height, border_radius=0, effect=DropShadowEffect())
         textbox = self.amount.get_textbox()
+        
+        self.register_data_widget('transaction-type', _type)
 
         _type.activated.connect(lambda: textbox.setFocus())
 
