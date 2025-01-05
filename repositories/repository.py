@@ -1,7 +1,14 @@
 import logging
 
-class Repository:
+from PyQt6.QtCore import QObject, pyqtSignal
+
+
+class Repository(QObject):
+    on_update = pyqtSignal(list)
+
     def __init__(self, db):
+        super().__init__()
+
         self.logger = logging.getLogger(self.__class__.__name__)
         self._db = db
         self._conn = db.connection()
@@ -34,26 +41,28 @@ class Repository:
         """
         Executes a commit query, for write operations
         """
+        
         if not self._db.is_connected():
             self.logger.error('Database is not connected, did not execute commit')
             return False
 
         cursor = None
+        success = False
 
         try:
             cursor = self._conn.cursor()
             cursor.execute(query, params or ())
             self._conn.commit()
 
-            return True
+            success = True
         except Exception as e:
             self.logger.error(f'Could not execute commit: {e}')
             self._conn.rollback()  # Ensure invalid data is not committed to the database
-
-            return False
         finally:
             if cursor:
                 cursor.close()
+
+        return success
 
     def execute_commit_many(self, query: str, params: list[tuple]) -> bool:
         """
@@ -64,18 +73,19 @@ class Repository:
             return False
 
         cursor = None
+        success = False
 
         try:
             cursor = self._conn.cursor()
             cursor.executemany(query, params)
             self._conn.commit()
 
-            return True
+            success = True
         except Exception as e:
             self.logger.error(f'Could not execute commit many: {e}')
             self._conn.rollback()
-
-            return False
         finally:
             if cursor:
                 cursor.close()
+
+        return success

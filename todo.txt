@@ -1,3 +1,10 @@
 overnight funding calculator
 
 Add transaction treeview tag overlap menu
+
+-----
+
+csv: tag algorithm
+addTransaction: add date input
+
+add currency manager

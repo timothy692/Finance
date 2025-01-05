@@ -1,7 +1,9 @@
 import csv
-from typing import Dict, List
 
 from PyQt6.QtWidgets import QFileDialog
+from charset_normalizer import from_path
+
+from models.transaction import Transaction
 
 
 class CSV:
@@ -10,36 +12,42 @@ class CSV:
             'Swedbank': {
                 'Radnummer': None,
                 'Bokföringsdag': None,
-                'Transaktionsdag': 'date',
                 'Valutadag': None,
                 'Referens': None,
+                'Transaktionsdag': 'date',
                 'Beskrivning': 'description',
                 'Belopp': 'amount',
-                'Bokfört saldo': 'balance',
+                'Bokfört saldo': 'balance', 
+                # category here
+                'Produkt': 'account', 
             }
         }
 
-    def validate_headers(self, bank: str, headers: List[str]) -> Dict[str,str]:
+        self._data = []
+
+    def validate_headers(self, bank: str, headers: list[str]) -> dict[str,str]:
         """
-        Validates the list of headers, leaving out unnecessary headers\n
-        Returns a dictionary containing the raw and translated header
+        Validates the list of valid headers\n
+        Returns a dictionary containing the index and translated header
         """
 
         valids = {}
         mapping = self.BANK_HEADER_MAPPINGS.get(bank)
         
-        for header in headers:
-            if header in list(mapping.keys()) and mapping[header]:
-                valids[header] = mapping[header]
+        for idx,header in enumerate(headers):
+            s = header.strip()
+
+            if s in list(mapping.keys()) and mapping[s]:
+                valids[mapping[s]] = idx
 
         return valids
     
-    def parse_csv(self, bank: str, content: List[List[str]]) -> List[Dict[str,any]]:
+    def parse_csv(self, bank: str, content: list[list[str]]) -> list[Transaction]:
         """
         Returns a list of dictionaries containing the transaction data 
         """
         
-        data = [{}]
+        data = []
         indexed_headers = {}
         start_idx = 0
 
@@ -48,39 +56,32 @@ class CSV:
             if any(s is None or s == '' for s in row):
                 continue
 
-            # Populating headers dictionary with indices and translated header
-            headers = self.validate_headers(bank=bank, headers=row)
-            for idx,col in enumerate(row):
-                if col in list(headers.keys()):
-                    indexed_headers[idx] = headers[col]
+            indexed_headers = self.validate_headers(bank=bank, headers=row)
 
             start_idx = n+1
             break
-
-        # Start parsing from the header to end of file
+        
         for row in content[start_idx:]:
-            row_data = {}
-
-            for idx,header in indexed_headers.items():
-                item = row[idx]
-
-                # Convert number columns to floats
-                if header in ['amount', 'balance']:
-                    item = item.replace(',', '').strip()
-
-                    row_data[header] = float(item)
-                    continue
-
-                row_data[header] = item
-
-            data.append(row_data)
+            data_dict = {header: row[index] for header, index in indexed_headers.items()}
+            
+            data.append(Transaction(
+                date=data_dict['date'],
+                description=data_dict['description'],
+                amount=data_dict['amount'],
+                balance=data_dict['balance'],
+                account=data_dict['account'],
+                category=[],                            # TODO: tag algorithm
+            ))
 
         return data
+    
+    def data(self) -> list[Transaction]:
+        return self._data
 
-    def import_csv(self) -> List[Dict[str,any]] | None:
+    def import_csv(self) -> bool:
         """
         Opens a QFileDialog to import a CSV file\n
-        Returns a list of dictionaries containing the transaction data, if accepted
+        Returns True if a file was successfully opened
         """
 
         dialog = QFileDialog()
@@ -90,10 +91,13 @@ class CSV:
 
         if dialog.exec():
             file = dialog.selectedFiles()[0]
-            
-            with open(file, mode='r', encoding='utf-8', errors='replace') as f:
+
+            encoding = from_path(file).best().encoding
+
+            with open(file, mode='r', encoding=encoding) as f:
                 reader = csv.reader(f)
 
-                return self.parse_csv(bank='Swedbank', content=[line for line in reader])
-            
-        return None
+                self._data = self.parse_csv(bank='Swedbank', content=[line for line in reader])
+            return True
+        else:
+            return False

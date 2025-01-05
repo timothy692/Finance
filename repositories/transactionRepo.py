@@ -9,29 +9,53 @@ class TransactionRepository(Repository):
         super().__init__(db)
 
     def fetch_transactions(self) -> list[Transaction]:
+        """
+        Fetch all transactions from the database
+        """
+
         transactions = []
 
         result = self.execute_query('SELECT * FROM transactions')
 
         for row in result:
+            # Convert category string back to a list
+            category = str(row[6]).split(',')
+
             transactions.append(Transaction(
-                row[0], row[1], row[2], row[3], row[4], row[5], row[6]
+                identifier=row[0],
+
+                date=row[1], description=row[2], 
+                amount=row[3], balance=row[4], 
+                account=row[5], category=category
             ))
 
         return transactions
 
-    def put_transaction(self, date: str, description: str, amount: float, balance: float, categories: list[str]|str, account: str) -> bool:
+    def put_transaction(self, transaction: Transaction) -> bool:
         """
-        Inserts a single transaction to the database
+        Inserts a single transaction to the database\n
+        Emits a signal to on_update on success
         """
         
-        return self.execute_commit('INSERT INTO transactions (date,description,amount,balance,category,account)', 
-                            (date,description,amount,balance,categories,account))
+        success = self.execute_commit('INSERT INTO transactions (date,description,amount,balance,category,account) \
+                                      VALUES (?,?,?,?,?,?)', 
+                                    transaction.as_tuple())
+        
+        if success:
+            self.on_update.emit([transaction])
 
-    def put_transactions_many(self, transactions: list[dict[str, any]]) -> None:
+        return success
+
+    def put_transactions_many(self, transactions: list[Transaction]) -> None:
         """
-        Inserts transactions in bulk to the database
+        Inserts transactions in bulk to the database\n
+        Emits a signal to on_update on success
         """
 
-        return self.execute_commit_many('INSERT INTO transactions (date,description,amount,balance,category,account)',
-                                transactions)
+        success = self.execute_commit_many('INSERT INTO transactions (date,description,amount,balance,category,account) \
+                                        VALUES (?,?,?,?,?,?)', [t.as_tuple() for t in transactions])
+        
+        if success:
+            self.on_update.emit(transactions)
+
+        return success

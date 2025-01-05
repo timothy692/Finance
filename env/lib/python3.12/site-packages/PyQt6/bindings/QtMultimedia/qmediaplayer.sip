@@ -141,6 +141,19 @@ signals:
 %If (Qt_6_5_0 -)
     void playingChanged(bool playing);
 %End
+
+public:
+%If (Qt_6_8_0 -)
+    void setAudioBufferOutput(QAudioBufferOutput *output);
+%End
+%If (Qt_6_8_0 -)
+    QAudioBufferOutput *audioBufferOutput() const;
+%End
+
+signals:
+%If (Qt_6_8_0 -)
+    void audioBufferOutputChanged();
+%End
 };
 
 %End

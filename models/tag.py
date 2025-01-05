@@ -2,9 +2,11 @@ from dataclasses import dataclass
 
 from PyQt6.QtGui import QColor
 
+from .dataModel import DataModel
+
 
 @dataclass
-class Tag:
+class Tag(DataModel):
     key: str
     text: str
     background: QColor

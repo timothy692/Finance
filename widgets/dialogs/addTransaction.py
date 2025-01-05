@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 from functools import partial
 
 from PyQt6.QtGui import QIcon, QColor, QPixmap, QPainter, QFontMetrics
@@ -7,14 +8,14 @@ from PyQt6.QtCore import QRect, QSize, QPoint, QMargins
 from PyQt6.QtWidgets import *
 
 from db import database
-from repositories.tagRepo import TagRepository
 from models.tag import Tag
+from repositories.tagRepo import TagRepository
 from util.doubleValidator import DoubleValidator
 from widgets.util.styleUtil import load_stylesheet
 from widgets.util.dropshadow import DropShadowEffect
 from widgets.components.input import Input
-from widgets.components.combobox import ComboBox
 from widgets.layouts.flowlayout import FlowLayout
+from widgets.components.combobox import ComboBox
 
 from .dialog import FramelessDialog
 
@@ -72,12 +73,16 @@ class TransactionDialog(FramelessDialog):
         self.container.addStretch()
     
     def on_save(self):
-        self.add_data('tags', [tag for tag in self._added_tags])
-        amount = int(self.amount.get_textbox().text().replace(self.currency, '').strip())
+        self.add_data('tags', self._added_tags)
+        self.add_data('date', datetime.now().strftime('%Y-%m-%d'))         # TODO: add date inut
+        self.add_data('amount', 0)
 
         is_expense = self._collect_data()['transaction-type'].lower() == 'expense'
 
-        self.add_data('amount', -amount if is_expense else amount)
+        if self.amount.get_textbox().text():
+            amount = int(self.amount.get_textbox().text().replace(self.currency, '').strip())
+
+            self.add_data('amount', -amount if is_expense else amount)
 
         return super().on_save()
 

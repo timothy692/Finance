@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSizePolicy,
 
 
 class PanelWidget(QFrame):
-    def __init__(self, title: str, value: float):
+    def __init__(self, title: str, value: float, diff: int):
         super().__init__()
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setFrameShape(QFrame.Shape.StyledPanel)
@@ -52,12 +52,14 @@ class PanelWidget(QFrame):
         indicator_layout.setSpacing(10) 
 
         icon_label = QLabel()
-        icon_pixmap = QPixmap('assets/icons/uptrend.png').scaled(22, 22, 
+
+        pixmap_asset = 'assets/icons/uptrend.png' if diff >= 0 else 'assets/icons/downtrend.png'
+        icon_pixmap = QPixmap(pixmap_asset).scaled(22, 22, 
                                                            qt.AspectRatioMode.KeepAspectRatio, 
                                                            qt.TransformationMode.SmoothTransformation)
         icon_label.setPixmap(icon_pixmap)
 
-        indicator = QLabel('0% vs last month')
+        indicator = QLabel(f'{diff}% vs last month')
         indicator.setFont(QFont('Inter Regular', 12))
         indicator.setStyleSheet('color: #545454;')
 
