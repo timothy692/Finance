@@ -22,10 +22,7 @@ class TransactionsPage(Page):
     def __init__(self):
         self._transaction_repo = database.get_repository(TransactionRepository)
 
-        self._finance_service = FinanceService()
-        self._finance_service.load(
-            self._transaction_repo.fetch_transactions()
-        )
+        self._finance_service = FinanceService(self._transaction_repo)
 
         # self._finance_service.load(self._transaction_repo.fetch_transactions())
 

@@ -39,10 +39,10 @@ class TransactionRepository(Repository):
         
         success = self.execute_commit('INSERT INTO transactions (date,description,amount,balance,category,account) \
                                       VALUES (?,?,?,?,?,?)', 
-                                    transaction.as_tuple())
+                                    transaction.to_tuple())
         
         if success:
-            self.on_update.emit([transaction])
+            self.update.emit([transaction])
 
         return success
 
@@ -53,9 +53,9 @@ class TransactionRepository(Repository):
         """
 
         success = self.execute_commit_many('INSERT INTO transactions (date,description,amount,balance,category,account) \
-                                        VALUES (?,?,?,?,?,?)', [t.as_tuple() for t in transactions])
+                                        VALUES (?,?,?,?,?,?)', [t.to_tuple() for t in transactions])
         
         if success:
-            self.on_update.emit(transactions)
+            self.update.emit(transactions)
 
         return success

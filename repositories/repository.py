@@ -4,7 +4,11 @@ from PyQt6.QtCore import QObject, pyqtSignal
 
 
 class Repository(QObject):
-    on_update = pyqtSignal(list)
+    update = pyqtSignal(list)
+    """
+    Called on update, returns a list of data models
+    """
+
 
     def __init__(self, db):
         super().__init__()
@@ -17,6 +21,7 @@ class Repository(QObject):
         """
         Executes a query and returns the results, for read-only operations
         """
+
         if not self._db.is_connected(): 
             self.logger.error('Database is not connected, did not execute query')
             return []
@@ -68,6 +73,7 @@ class Repository(QObject):
         """
         Executes a commit query in bulk, for write operations
         """
+        
         if not self._db.is_connected():
             self.logger.error('Database is not connected, did not execute query')
             return False

@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import *
 from widgets.util.styleUtil import load_stylesheet
 from widgets.components.separator import Separator
 
-
 class Page(QFrame):
     def __init__(self):
         super().__init__()

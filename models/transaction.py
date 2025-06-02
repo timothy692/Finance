@@ -20,11 +20,7 @@ class Transaction(DataModel):
 
         return datetime.datetime.strptime(stripped, _format).date()
     
-    def as_tuple(self) -> tuple:
-        """
-        Used when importing data into the database
-        """
-
+    def to_tuple(self) -> tuple:
         # Convert list of tags to concatenated  string
         category = ','.join([tag.text for tag in self.category])
         

@@ -1,19 +1,26 @@
-from PyQt6.QtCore import QRectF
+from PyQt6.QtGui import QFont, QIcon, QColor, QPixmap, QPainter
 from PyQt6.QtCore import Qt as qt
-from PyQt6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
-from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QSizePolicy,
-                             QVBoxLayout)
+from PyQt6.QtCore import QRectF
+from PyQt6.QtWidgets import QFrame, QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout
+
+from .dynamicWidget import DynamicWidget
 
 
-class PanelWidget(QFrame):
-    def __init__(self, title: str, value: float, diff: int):
-        super().__init__()
+class PanelWidget(DynamicWidget, QFrame):
+    def __init__(self, title: str, initial_values: dict):
+        DynamicWidget.__init__(self)
+        QFrame.__init__(self)
+
+        self._diff = 0
+        self._amount = 0
+
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setFrameShadow(QFrame.Shadow.Raised)
         self.setObjectName('frame')
 
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            '''
             QFrame#frame {
                 border: 2px solid #7D7BFF;
                 border-radius: 10px;
@@ -24,11 +31,36 @@ class PanelWidget(QFrame):
             QLabel {
                 background-color: #F8F8FF;
             }
-        """)
+            '''
+        )
 
         self.setMinimumWidth(380)
         self.setFixedHeight(130)
 
+        self._init_layout(title)
+
+        self.update(initial_values)  
+
+    def update(self, values: dict) -> None:
+        self._diff += values['difference']
+        self._amount += values['amount']
+
+        self._update_indicator(self._diff)
+        self._update_value_label(self._amount)
+
+    def _update_indicator(self, difference: int):
+        pixmap_asset = 'assets/icons/uptrend.png' if difference > 0 else 'assets/icons/downtrend.png'
+        icon_pixmap = QPixmap(pixmap_asset).scaled(22, 22, 
+                                                           qt.AspectRatioMode.KeepAspectRatio, 
+                                                           qt.TransformationMode.SmoothTransformation)
+        self._indicator_icon.setPixmap(icon_pixmap)
+        
+        self._indicator_label.setText(f'{difference}% vs last month')
+
+    def _update_value_label(self, amount: str):
+        self._value_label.setText('${:,.2f}'.format(amount))  
+
+    def _init_layout(self, title: str) -> None:
         main_layout = QHBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(5)
@@ -41,37 +73,34 @@ class PanelWidget(QFrame):
             'color: #545454;'
         )
         
-        value_label = QLabel('${:,.2f}'.format(value))
-        value_label.setFont(QFont('Inter Regular', 19))
-        value_label.setStyleSheet(
+        # Value label indicating the amount
+        self._value_label = QLabel()
+        self._value_label.setFont(QFont('Inter Regular', 19))
+        self._value_label.setStyleSheet(
             'color: black;'
         )
 
         indicator_layout = QHBoxLayout()
         indicator_layout.setContentsMargins(0, 0, 0, 0)
-        indicator_layout.setSpacing(10) 
+        indicator_layout.setSpacing(5) 
 
-        icon_label = QLabel()
+        # Indicator icon indicating downtrend or uptrend
+        self._indicator_icon = QLabel()
 
-        pixmap_asset = 'assets/icons/uptrend.png' if diff >= 0 else 'assets/icons/downtrend.png'
-        icon_pixmap = QPixmap(pixmap_asset).scaled(22, 22, 
-                                                           qt.AspectRatioMode.KeepAspectRatio, 
-                                                           qt.TransformationMode.SmoothTransformation)
-        icon_label.setPixmap(icon_pixmap)
+        # Indicator label indicating % vs last month
+        self._indicator_label = QLabel()
+        self._indicator_label.setFont(QFont('Inter Regular', 12))
+        self._indicator_label.setStyleSheet('color: #545454;')
 
-        indicator = QLabel(f'{diff}% vs last month')
-        indicator.setFont(QFont('Inter Regular', 12))
-        indicator.setStyleSheet('color: #545454;')
-
-        indicator_layout.addWidget(icon_label)
-        indicator_layout.addWidget(indicator)
+        indicator_layout.addWidget(self._indicator_icon)
+        indicator_layout.addWidget(self._indicator_label)
 
         indicator_widget = QFrame()
         indicator_widget.setStyleSheet('background-color: transparent;')
         indicator_widget.setLayout(indicator_layout)
 
         label_layout.addWidget(title_label, alignment=qt.AlignmentFlag.AlignLeft)
-        label_layout.addWidget(value_label, alignment=qt.AlignmentFlag.AlignLeft)
+        label_layout.addWidget(self._value_label, alignment=qt.AlignmentFlag.AlignLeft)
         label_layout.addWidget(indicator_widget, alignment=qt.AlignmentFlag.AlignLeft)
 
         main_layout.addLayout(label_layout)

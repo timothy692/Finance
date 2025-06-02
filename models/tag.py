@@ -14,3 +14,6 @@ class Tag(DataModel):
 
     def is_valid(self) -> bool:
         return len(self.text) <= 16
+    
+    def to_tuple(self):
+        return (self.key, self.text, self.background, self.foreground)
